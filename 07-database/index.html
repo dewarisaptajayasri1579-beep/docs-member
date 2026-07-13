@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Documentation — Central Membership &amp; SSO Hub</title>
+    <style>
+      :root { color-scheme: dark; --bg:#0f0f13; --surface:#1a1a24; --line:#2a2a38; --text:#f1f0ff; --muted:#a1a1b5; --accent:#a78bfa; --accent-strong:#7c3aed; --code:#22222f; }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { margin:0; background:var(--bg); color:var(--text); font:15px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+      .layout { max-width:1440px; margin:auto; display:grid; grid-template-columns:250px minmax(0, 1fr); }
+      aside { position:sticky; top:0; height:100vh; padding:28px 20px; border-right:1px solid var(--line); background:#121219; }
+      .brand { display:block; color:var(--text); text-decoration:none; font-weight:800; line-height:1.25; margin-bottom:30px; }
+      .brand span { display:block; color:var(--accent); font-size:12px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+      nav a { display:block; color:var(--muted); text-decoration:none; border-radius:8px; padding:9px 10px; margin:3px 0; }
+      nav a:hover { background:var(--surface); color:var(--text); }
+      main { padding:48px clamp(22px, 5vw, 72px) 80px; min-width:0; }
+      header { padding:30px; border:1px solid #4c3b78; border-radius:18px; background:linear-gradient(135deg, #20183a, var(--surface)); margin-bottom:46px; }
+      h1,h2,h3 { line-height:1.25; scroll-margin-top:24px; }
+      h1 { margin:0 0 10px; font-size:clamp(28px,4vw,42px); }
+      h2 { border-bottom:1px solid var(--line); margin:54px 0 20px; padding-bottom:10px; font-size:25px; }
+      h3 { margin:34px 0 14px; font-size:19px; }
+      p,.lead { color:var(--muted); }
+      .lead { margin:0; font-size:17px; }
+      .note { border-left:3px solid var(--accent-strong); background:var(--surface); padding:14px 16px; border-radius:0 10px 10px 0; color:var(--muted); }
+      table { width:100%; border-collapse:collapse; margin:16px 0 28px; background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden; display:table; }
+      th,td { padding:11px 13px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+      th { color:#ddd6fe; background:#211b32; font-size:13px; }
+      tr:last-child td { border-bottom:0; }
+      code,pre { font-family:"JetBrains Mono", "SFMono-Regular", Consolas, monospace; }
+      code { color:#ddd6fe; background:var(--code); padding:2px 5px; border-radius:4px; font-size:.9em; }
+      pre { white-space:pre-wrap; padding:18px; overflow:auto; border:1px solid var(--line); border-radius:10px; background:var(--code); color:#ddd6fe; }
+      ul,ol { color:var(--muted); padding-left:24px; }
+      footer { border-top:1px solid var(--line); margin-top:60px; padding-top:20px; color:var(--muted); font-size:13px; }
+      @media (max-width:800px) { .layout{display:block}.layout aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)} nav{display:flex;gap:4px;overflow:auto}nav a{white-space:nowrap}.brand{margin-bottom:14px}main{padding-top:30px}table{display:block;overflow-x:auto} }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside>
+        <a class="brand" href="#top"><span>Central Membership &amp; SSO Hub</span>Database Documentation</a>
+        <nav aria-label="Navigasi dokumentasi">
+          <a href="#overview">Ringkasan</a>
+          <a href="#erd">ERD &amp; Relasi</a>
+          <a href="#conventions">Konvensi</a>
+          <a href="#core">Tabel inti</a>
+          <a href="#identity">Identity &amp; OAuth2</a>
+          <a href="#operations">Operasional</a>
+          <a href="#dictionary">Data dictionary</a>
+          <a href="#security">Kualitas &amp; keamanan</a>
+        </nav>
+      </aside>
+      <main id="top">
+        <header id="overview">
+          <h1>Database Documentation</h1>
+          <p class="lead">Dokumen gabungan ERD, spesifikasi tabel, dan data dictionary untuk Central Membership &amp; SSO Hub.</p>
+        </header>
+
+        <section id="erd">
+          <h2>Entity Relationship Diagram (ERD)</h2>
+          <p>Database utama memakai PostgreSQL 15+ dan Prisma. Primary key berupa UUID, semua waktu bertipe <code>timestamptz</code> dalam UTC, dan penamaan menggunakan <code>snake_case</code>.</p>
+          <pre>members ──&lt; licenses &gt;── products ──&lt; plans
+   │               │              │
+   ├──&lt; orders &gt;──┴──────────────┘
+   │       │
+   │       └──&lt; payments ──&lt; webhook_events
+   ├──&lt; email_verification_tokens
+   ├──&lt; password_reset_tokens
+   ├──&lt; authorization_codes &gt;── oauth_clients
+   ├──&lt; refresh_tokens &gt;── oauth_clients
+   ├──&lt; audit_logs
+   └──  notification_preferences
+
+jwt_signing_keys ──&lt; refresh_tokens</pre>
+          <table><thead><tr><th>Relasi</th><th>Kardinalitas</th><th>Aturan integritas</th></tr></thead><tbody>
+            <tr><td>Member → License</td><td>1 : N</td><td>Satu member hanya boleh memiliki satu lisensi yang masih berlaku per produk.</td></tr>
+            <tr><td>Product → Plan</td><td>1 : N</td><td>Paket selalu dimiliki tepat oleh satu produk.</td></tr>
+            <tr><td>License → Order</td><td>1 : N</td><td>Order dapat membuat lisensi baru atau memperpanjang lisensi yang ada.</td></tr>
+            <tr><td>Order → Payment</td><td>1 : N</td><td>Mendukung percobaan ulang; hanya pembayaran sukses yang memfinalkan order.</td></tr>
+            <tr><td>Payment → Webhook Event</td><td>1 : N</td><td>Payload/retry gateway dicatat untuk audit dan idempotensi.</td></tr>
+            <tr><td>OAuth Client → Code/Token</td><td>1 : N</td><td>Authorization code dan refresh token terikat pada client peminta.</td></tr>
+          </tbody></table>
+          <p class="note">Gunakan partial unique index pada <code>licenses (member_id, product_id)</code> untuk status selain <code>cancelled</code>, agar tidak ada lisensi berlaku ganda untuk produk yang sama.</p>
+        </section>
+
+        <section id="conventions">
+          <h2>Konvensi umum</h2>
+          <ul><li>Primary key: <code>uuid</code> dengan default <code>gen_random_uuid()</code>.</li><li>Nominal: <code>bigint</code> unit minor (Rp50.000 = <code>50000</code>), bukan floating point.</li><li>Password, token, dan client secret hanya disimpan sebagai hash.</li><li>Entitas bisnis utama memiliki <code>created_at</code> dan <code>updated_at</code>.</li></ul>
+        </section>
+
+        <section id="core">
+          <h2>Tabel inti</h2>
+          <table><thead><tr><th>Tabel</th><th>Fungsi</th><th>Kunci dan constraint utama</th></tr></thead><tbody>
+            <tr><td><code>members</code></td><td>Akun member dan admin.</td><td><code>email</code> unik; role <code>member</code>/<code>super_admin</code>.</td></tr>
+            <tr><td><code>products</code></td><td>Katalog aplikasi SaaS.</td><td><code>code</code> unik, contoh <code>NTO</code>.</td></tr>
+            <tr><td><code>plans</code></td><td>Paket per produk.</td><td>Unik <code>(product_id, code)</code>; harga tidak negatif.</td></tr>
+            <tr><td><code>licenses</code></td><td>Hak akses member ke produk.</td><td><code>license_key</code> unik; satu lisensi berlaku per member-produk.</td></tr>
+            <tr><td><code>orders</code></td><td>Sesi checkout/renewal.</td><td><code>order_number</code> unik; menyimpan snapshot nilai checkout.</td></tr>
+            <tr><td><code>payments</code></td><td>Upaya dan hasil pembayaran.</td><td>ID transaksi gateway unik per gateway.</td></tr>
+            <tr><td><code>webhook_events</code></td><td>Callback gateway untuk audit/retry.</td><td>Payload <code>jsonb</code>; event dapat diidentifikasi idempoten.</td></tr>
+          </tbody></table>
+          <h3>Members</h3>
+          <table><thead><tr><th>Kolom</th><th>Tipe</th><th>Null</th><th>Keterangan</th></tr></thead><tbody>
+            <tr><td><code>id</code></td><td>uuid</td><td>Tidak</td><td>Primary key.</td></tr><tr><td><code>email</code></td><td>varchar(320)</td><td>Tidak</td><td>Ditim, lowercase, dan unik.</td></tr><tr><td><code>full_name</code></td><td>varchar(120)</td><td>Tidak</td><td>Nama tampilan.</td></tr><tr><td><code>password_hash</code></td><td>varchar(255)</td><td>Ya</td><td>Hash Argon2/bcrypt.</td></tr><tr><td><code>status</code></td><td>member_status</td><td>Tidak</td><td><code>unverified</code>, <code>active</code>, <code>suspended</code>, <code>deleted</code>.</td></tr><tr><td><code>role</code></td><td>member_role</td><td>Tidak</td><td><code>member</code> atau <code>super_admin</code>.</td></tr><tr><td><code>avatar_url</code>, <code>last_login_at</code></td><td>text/timestamptz</td><td>Ya</td><td>Data tambahan profil dan login.</td></tr>
+          </tbody></table>
+          <h3>Products, plans, dan licenses</h3>
+          <table><thead><tr><th>Tabel</th><th>Kolom utama</th><th>Keterangan</th></tr></thead><tbody>
+            <tr><td><code>products</code></td><td><code>id, code, name, description, website_url, sso_redirect_uri, is_active, grace_period_days</code></td><td><code>code</code> 2–4 huruf kapital; grace period default 7 hari.</td></tr>
+            <tr><td><code>plans</code></td><td><code>id, product_id, code, name, type, billing_interval, price_amount, currency, duration_days, features, is_active</code></td><td><code>features</code> berupa JSONB; paket free bernilai 0 dan dapat tanpa expiry.</td></tr>
+            <tr><td><code>licenses</code></td><td><code>member_id, product_id, plan_id, license_key, tier, status, started_at, expired_at, grace_period_ends_at, cancelled_at</code></td><td>Status: <code>active</code>, <code>active_free</code>, <code>grace_period</code>, <code>suspended</code>, <code>cancelled</code>.</td></tr>
+          </tbody></table>
+          <h3>Orders, payments, dan webhook</h3>
+          <table><thead><tr><th>Tabel</th><th>Kolom utama</th><th>Keterangan</th></tr></thead><tbody>
+            <tr><td><code>orders</code></td><td><code>order_number, member_id, product_id, plan_id, license_id, status, amount, currency, gateway, expires_at, paid_at</code></td><td>Status: <code>pending_payment</code>, <code>paid</code>, <code>failed</code>, <code>expired</code>, <code>cancelled</code>, <code>duplicate</code>.</td></tr>
+            <tr><td><code>payments</code></td><td><code>order_id, gateway, gateway_transaction_id, gateway_reference, status, amount, currency, paid_at, raw_response</code></td><td>Status canonical: <code>pending</code>, <code>settlement</code>, <code>failed</code>, <code>expired</code>, <code>cancelled</code>, <code>refunded</code>.</td></tr>
+            <tr><td><code>webhook_events</code></td><td><code>payment_id, gateway, external_event_id, event_type, signature_valid, processed_at, payload, received_at</code></td><td>Event invalid tetap dicatat tanpa aktivasi lisensi.</td></tr>
+          </tbody></table>
+        </section>
+
+        <section id="identity"><h2>Identity &amp; OAuth2</h2><table><thead><tr><th>Tabel</th><th>Kolom utama</th><th>Keterangan</th></tr></thead><tbody>
+          <tr><td><code>email_verification_tokens</code></td><td><code>member_id, token_hash, expires_at, used_at</code></td><td>Token baru membatalkan token lama; hanya token valid dan belum dipakai diterima.</td></tr>
+          <tr><td><code>password_reset_tokens</code></td><td><code>member_id, token_hash, expires_at, used_at</code></td><td>Lifecycle sama dengan token verifikasi.</td></tr>
+          <tr><td><code>oauth_clients</code></td><td><code>client_id, client_secret_hash, name, redirect_uris, allowed_scopes, is_active</code></td><td>URI dan scope berupa JSONB; client ID unik.</td></tr>
+          <tr><td><code>authorization_codes</code></td><td><code>code_hash, member_id, oauth_client_id, product_id, license_id, redirect_uri, scope, code_challenge, expires_at, used_at</code></td><td>Sekali pakai dan memakai PKCE.</td></tr>
+          <tr><td><code>refresh_tokens</code></td><td><code>token_hash, member_id, oauth_client_id, product_id, license_id, signing_key_id, scope, expires_at, revoked_at, replaced_by_id</code></td><td>Direvoke saat logout, insiden, atau lisensi suspended.</td></tr>
+          <tr><td><code>jwt_signing_keys</code></td><td><code>kid, algorithm, public_jwk, private_key_reference, activated_at, retired_at, is_active</code></td><td>RS256; private key tersimpan di secret manager.</td></tr>
+        </tbody></table></section>
+
+        <section id="operations"><h2>Tabel operasional</h2><table><thead><tr><th>Tabel</th><th>Kolom utama</th><th>Keterangan</th></tr></thead><tbody>
+          <tr><td><code>notification_preferences</code></td><td><code>member_id, marketing_email_enabled, expiry_reminder_enabled, product_updates_enabled, updated_at</code></td><td>Satu-ke-satu dengan member; email transaksional tetap dikirim.</td></tr>
+          <tr><td><code>audit_logs</code></td><td><code>actor_id, actor_role, action, object_type, object_id, result, ip_address, user_agent, metadata, created_at</code></td><td>Append-only; metadata tidak boleh memuat password, token, atau secret.</td></tr>
+        </tbody></table></section>
+
+        <section id="dictionary"><h2>Data dictionary</h2><table><thead><tr><th>Domain</th><th>Nilai</th><th>Arti</th></tr></thead><tbody>
+          <tr><td><code>member_status</code></td><td><code>unverified, active, suspended, deleted</code></td><td>Lifecycle akun.</td></tr><tr><td><code>member_role</code></td><td><code>member, super_admin</code></td><td>Otorisasi aplikasi.</td></tr><tr><td><code>plan_type</code></td><td><code>free, trial, paid</code></td><td>Model komersial paket.</td></tr><tr><td><code>license_status</code></td><td><code>active, active_free, grace_period, suspended, cancelled</code></td><td>Status lisensi dan claim JWT.</td></tr><tr><td><code>order_status</code></td><td><code>pending_payment, paid, failed, expired, cancelled, duplicate</code></td><td>Status checkout.</td></tr><tr><td><code>payment_status</code></td><td><code>pending, settlement, failed, expired, cancelled, refunded</code></td><td>Status pembayaran.</td></tr><tr><td><code>payment_gateway</code></td><td><code>midtrans, xendit</code></td><td>Gateway versi awal.</td></tr>
+        </tbody></table></section>
+
+        <section id="security"><h2>Kualitas &amp; keamanan data</h2><ol><li>Foreign key memakai <code>RESTRICT</code> untuk data keuangan/audit dan <code>CASCADE</code> hanya untuk token sementara.</li><li>Webhook dengan signature invalid tidak boleh mengubah order, payment, atau license; event tetap dicatat.</li><li>Settlement mengubah payment, order, license, dan audit log dalam satu transaksi database.</li><li>Akses payload webhook, audit log, serta data OAuth dibatasi untuk Super Admin atau service backend berwenang.</li><li>Unique constraint dan idempotency key menangani checkout/webhook ganda; frontend bukan satu-satunya kontrol.</li></ol></section>
+        <footer>Disusun dari <code>erd.md</code>, <code>tables.md</code>, dan <code>data-dictionary.md</code>.</footer>
+      </main>
+    </div>
+  </body>
+</html>
