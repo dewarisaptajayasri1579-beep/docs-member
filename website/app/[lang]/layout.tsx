@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import '../globals.css'
 import '../flow.css'
 import '../lang.css'
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
   title: 'MemberHub Docs',
   description: 'Panduan interaktif Central Membership & SSO Hub',
 }
+
 
 // Prevent flash of wrong theme before React hydrates
 const themeScript = `
@@ -27,7 +29,7 @@ export default async function RootLayout(
   return (
     <html lang={lang} data-theme="dark" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Script id="theme-script" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
         <DocsShell lang={lang} navigation={getNavigation(lang)}>{props.children}</DocsShell>
