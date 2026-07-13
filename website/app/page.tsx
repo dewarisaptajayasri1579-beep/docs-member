@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { FlowExplorer } from '@/components/flow-explorer'
+import { FlowDiagram } from '@/components/flow-diagram'
 import { getNavigation } from '@/lib/docs'
 
 const highlights = [
@@ -52,6 +53,7 @@ export default function HomePage() {
         </ol>
       </section>
 
+      <FlowDiagram />
       <FlowExplorer />
     </main>
   )

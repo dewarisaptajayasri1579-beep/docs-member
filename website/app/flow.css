@@ -1,11 +1,185 @@
+/* ── Flow Diagram ──────────────────────────────────────────── */
+.fd-wrap {
+  margin-top: 44px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.fd-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 28px 0;
+}
+.fd-header h2 {
+  margin: 6px 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.fd-header > div > p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+
+.fd-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.fd-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+  white-space: nowrap;
+}
+.fd-tab:hover { border-color: var(--accent); color: var(--text); background: var(--accent-glow); }
+.fd-tab.active {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+.fd-tab span { font-size: 16px; }
+
+.fd-body {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 0;
+  min-height: 460px;
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.fd-svg-wrap {
+  padding: 24px;
+  overflow: auto;
+  border-right: 1px solid var(--line);
+}
+
+/* Info panel */
+.fd-info {
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fd-info-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+.fd-info-badge[data-kind="ok"]   { background: #052e1a; color: #6ee7b7; border: 1px solid #10b981; }
+.fd-info-badge[data-kind="fail"] { background: #2a0a0a; color: #fca5a5; border: 1px solid #ef4444; }
+.fd-info-badge[data-kind="warn"] { background: #2a1a00; color: #fcd34d; border: 1px solid #f59e0b; }
+.fd-info-badge[data-kind="dec"]  { background: #1c1500; color: #fcd34d; border: 1px solid #f59e0b; }
+.fd-info-badge[data-kind="sys"]  { background: #0f172a; color: #93c5fd; border: 1px solid #3b82f6; }
+.fd-info-badge[data-kind="step"] { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+.fd-info-badge[data-kind="pill"] { background: #1a1430; color: #a78bfa; border: 1px solid #a78bfa; }
+
+.fd-info h3 {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+}
+.fd-info-sub {
+  font-size: 11.5px;
+  color: var(--accent);
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.fd-info-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.fd-info-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  text-align: center;
+  color: var(--dim);
+  padding: 20px 0;
+}
+.fd-info-empty span { font-size: 28px; opacity: .6; }
+.fd-info-empty p { font-size: 13px; line-height: 1.5; margin: 0; }
+
+.fd-legend {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.fd-legend > p {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 8px;
+}
+.fd-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 2px 0;
+}
+.fd-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.fd-dot[data-kind="ok"]   { background: #10b981; }
+.fd-dot[data-kind="warn"] { background: #f59e0b; }
+.fd-dot[data-kind="fail"] { background: #ef4444; }
+.fd-dot[data-kind="sys"]  { background: #3b82f6; }
+.fd-dot[data-kind="dec"]  { background: #f59e0b; border: 2px solid #92400e; border-radius: 2px; transform: rotate(45deg); }
+.fd-dot[data-kind="step"] { background: var(--line); }
+
+@media (max-width: 900px) {
+  .fd-body { grid-template-columns: 1fr; }
+  .fd-svg-wrap { border-right: 0; border-bottom: 1px solid var(--line); }
+  .fd-header { flex-direction: column; }
+  .fd-info { min-height: auto; }
+}
+
+/* ── Original Flow Explorer ──────────────────────────────────── */
 .flow-explorer {
   margin-top: 44px;
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: linear-gradient(140deg, color-mix(in srgb, var(--accent-strong) 10%, var(--surface)), var(--surface));
+  background: linear-gradient(140deg, color-mix(in srgb, var(--accent-strong) 8%, var(--surface)), var(--surface));
 }
-
 .flow-heading {
   display: flex;
   justify-content: space-between;
@@ -13,107 +187,67 @@
   gap: 20px;
 }
 .flow-heading h2 {
-  max-width: 520px;
-  margin: 8px 0 0;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.2;
+  max-width: 520px; margin: 8px 0 0;
+  font-size: 24px; font-weight: 700; line-height: 1.2;
 }
 .flow-heading > p {
-  max-width: 160px;
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-  text-align: right;
+  max-width: 160px; margin: 0;
+  color: var(--muted); font-size: 13px; text-align: right;
 }
-
 .flow-track {
-  display: flex;
-  position: relative;
-  gap: 8px;
-  margin: 30px 0 20px;
+  display: flex; position: relative;
+  gap: 8px; margin: 30px 0 20px;
 }
 .flow-track::before {
   content: '';
-  position: absolute;
-  top: 19px;
-  left: 32px;
-  right: 32px;
-  height: 1.5px;
-  background: var(--line);
+  position: absolute; top: 19px; left: 32px; right: 32px;
+  height: 1.5px; background: var(--line);
 }
-
 .flow-step {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  flex: 1;
-  gap: 7px;
-  justify-items: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  font: inherit;
+  position: relative; z-index: 1;
+  display: grid; flex: 1; gap: 7px;
+  justify-items: center; padding: 0;
+  border: 0; background: transparent;
+  color: var(--muted); cursor: pointer; font: inherit;
   transition: color var(--dur);
 }
 .flow-step b {
-  display: grid;
-  width: 40px;
-  height: 40px;
+  display: grid; width: 40px; height: 40px;
   place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: var(--surface);
-  font-size: 14px;
+  border: 1px solid var(--line); border-radius: 50%;
+  background: var(--surface); font-size: 14px;
   transition: all var(--dur) var(--ease);
 }
 .flow-step span { font-size: 12px; font-weight: 650; }
-
 .flow-step:hover { color: var(--text); }
 .flow-step:hover b { border-color: var(--accent); }
-
 .flow-step.active { color: var(--text); }
 .flow-step.active b {
-  border-color: var(--accent);
-  background: var(--accent-strong);
+  border-color: var(--accent); background: var(--accent-strong);
   box-shadow: 0 0 0 5px var(--accent-glow), 0 2px 12px rgba(124,58,237,.4);
   color: white;
 }
-
 .flow-detail {
-  min-height: 160px;
-  padding: 22px;
+  min-height: 160px; padding: 22px;
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
   border-radius: 12px;
   background: color-mix(in srgb, var(--accent-strong) 5%, var(--bg));
 }
 .flow-detail > span {
-  color: var(--accent);
-  font-size: 10.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .12em;
+  color: var(--accent); font-size: 10.5px;
+  font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
 }
 .flow-detail h3 { margin: 6px 0 8px; font-size: 20px; font-weight: 700; }
 .flow-detail > p { margin: 0; color: var(--muted); font-size: 14px; }
-
 .flow-technical {
-  margin-top: 16px;
-  padding: 12px 14px;
+  margin-top: 16px; padding: 12px 14px;
   border-left: 2px solid var(--accent);
-  border-radius: 0 8px 8px 0;
-  background: var(--surface);
+  border-radius: 0 8px 8px 0; background: var(--surface);
 }
 .flow-technical strong {
-  display: block;
-  font-size: 10.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: var(--dim);
-  margin-bottom: 4px;
+  display: block; font-size: 10.5px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--dim); margin-bottom: 4px;
 }
 .flow-technical p { margin: 0; color: var(--muted); font-size: 13px; }
 
