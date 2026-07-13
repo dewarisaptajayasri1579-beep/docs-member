@@ -20,19 +20,26 @@ function titleFromFilename(file: string) {
 }
 
 function walk(directory: string, relative = ''): string[] {
+  if (!fs.existsSync(directory)) return []
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     if (entry.isDirectory()) return ignoredDirectories.has(entry.name) ? [] : walk(path.join(directory, entry.name), path.join(relative, entry.name))
     return entry.isFile() && entry.name.endsWith('.md') ? [path.join(relative, entry.name)] : []
   })
 }
 
-export function getAllSlugs() {
-  return walk(DOCS_ROOT).map((file) => file.replace(/\.md$/, '').split(path.sep).filter((part) => part !== 'README'))
+function getDocsRoot(lang: string) {
+  return path.resolve(DOCS_ROOT, lang === 'en' ? 'en' : 'id')
 }
 
-export function getNavigation(): NavSection[] {
+export function getAllSlugs(lang: string = 'id') {
+  return walk(getDocsRoot(lang)).map((file) => file.replace(/\.md$/, '').split(path.sep).filter((part) => part !== 'README'))
+}
+
+export function getNavigation(lang: string = 'id'): NavSection[] {
   const groups = new Map<string, { items: NavItem[], sortKey: string }>()
-  for (const file of walk(DOCS_ROOT)) {
+  const root = getDocsRoot(lang)
+  
+  for (const file of walk(root)) {
     const parts = file.replace(/\.md$/, '').split(path.sep)
     const sectionRaw = parts[0] === 'README' ? 'Dokumentasi' : parts[0]
     const slug = parts.filter((part) => part !== 'README')
@@ -45,23 +52,31 @@ export function getNavigation(): NavSection[] {
   }
   
   return [...groups].map(([sectionRaw, group]) => ({
-    title: sectionRaw === 'Dokumentasi' ? 'Dokumentasi' : titleFromFilename(sectionRaw),
+    title: sectionRaw === 'Dokumentasi' ? (lang === 'en' ? 'Documentation' : 'Dokumentasi') : titleFromFilename(sectionRaw),
     sortKey: group.sortKey,
     items: group.items.sort((a, b) => a.sortKey.localeCompare(b.sortKey))
   })).sort((a, b) => {
-    if (a.title === 'Dokumentasi') return -1;
-    if (b.title === 'Dokumentasi') return 1;
+    if (a.title === 'Dokumentasi' || a.title === 'Documentation') return -1;
+    if (b.title === 'Dokumentasi' || b.title === 'Documentation') return 1;
     return a.sortKey.localeCompare(b.sortKey);
   })
 }
 
-export async function getDocument(slug: string[]): Promise<Document | null> {
-  const candidates = [path.join(DOCS_ROOT, ...slug) + '.md', path.join(DOCS_ROOT, ...slug, 'README.md')]
+export async function getDocument(slug: string[], lang: string = 'id'): Promise<Document | null> {
+  const root = getDocsRoot(lang)
+  const candidates = [path.join(root, ...slug) + '.md', path.join(root, ...slug, 'README.md')]
   const filePath = candidates.find((candidate) => fs.existsSync(candidate))
-  if (!filePath || !filePath.startsWith(DOCS_ROOT)) return null
+  
+  if (!filePath || !filePath.startsWith(root)) return null
+  
   const source = fs.readFileSync(filePath, 'utf8')
   const html = String(await remark().use(remarkGfm).use(remarkHtml, { sanitize: false }).process(source))
   const heading = source.match(/^#\s+(.+)$/m)?.[1] ?? titleFromFilename(path.basename(filePath))
-  const sectionRaw = path.relative(DOCS_ROOT, filePath).split(path.sep)[0]
-  return { title: heading, html, slug, section: sectionRaw === 'README.md' ? 'Dokumentasi' : titleFromFilename(sectionRaw) }
+  const sectionRaw = path.relative(root, filePath).split(path.sep)[0]
+  
+  const sectionTitle = sectionRaw === 'README.md' 
+    ? (lang === 'en' ? 'Documentation' : 'Dokumentasi') 
+    : titleFromFilename(sectionRaw)
+    
+  return { title: heading, html, slug, section: sectionTitle }
 }

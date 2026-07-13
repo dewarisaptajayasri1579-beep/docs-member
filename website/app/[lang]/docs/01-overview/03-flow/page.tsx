@@ -1,5 +1,9 @@
 import { FlowDiagram } from '@/components/flow-diagram'
 
+export function generateStaticParams() {
+  return [{ lang: 'id' }, { lang: 'en' }]
+}
+
 export const metadata = {
   title: 'Diagram Alur — MemberHub Docs',
   description: 'Diagram alur interaktif sistem Central Membership & SSO Hub',

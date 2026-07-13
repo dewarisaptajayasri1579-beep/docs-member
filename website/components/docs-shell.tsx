@@ -19,7 +19,7 @@ function ScrollProgress() {
   return <div className="scroll-progress" style={{ width: `${pct}%` }} />
 }
 
-export function DocsShell({ navigation, children }: { navigation: NavSection[]; children: React.ReactNode }) {
+export function DocsShell({ lang, navigation, children }: { lang: string; navigation: NavSection[]; children: React.ReactNode }) {
   const pathname = usePathname()
   const [query, setQuery] = useState('')
   const [detail, setDetail] = useState(false)
@@ -119,20 +119,25 @@ export function DocsShell({ navigation, children }: { navigation: NavSection[]; 
           <button
             className="hamburger"
             onClick={() => setMobileOpen(v => !v)}
-            aria-label="Buka menu"
+            aria-label={lang === 'en' ? 'Open menu' : 'Buka menu'}
           >
             <span /><span /><span />
           </button>
-          <Link href="/" className="topbar-home">⌂ Beranda</Link>
+          <Link href={`/${lang}`} className="topbar-home">⌂ {lang === 'en' ? 'Home' : 'Beranda'}</Link>
         </div>
         <div className="topbar-right">
+          <div className="lang-switcher">
+            <Link href={pathname.replace(`/${lang}`, '/id')} className={lang === 'id' ? 'active' : ''}>ID</Link>
+            <span className="sep">/</span>
+            <Link href={pathname.replace(`/${lang}`, '/en')} className={lang === 'en' ? 'active' : ''}>EN</Link>
+          </div>
           <div className="mode-toggle">
             <span>Simple</span>
             <button
               className="toggle-btn"
               onClick={() => setDetail(v => !v)}
               aria-pressed={detail}
-              aria-label="Ganti mode"
+              aria-label={lang === 'en' ? 'Toggle mode' : 'Ganti mode'}
             >
               <i className={`knob${detail ? ' on' : ''}`} />
             </button>
@@ -141,7 +146,7 @@ export function DocsShell({ navigation, children }: { navigation: NavSection[]; 
           <button
             className="theme-btn"
             onClick={() => setDark(v => !v)}
-            aria-label={dark ? 'Mode terang' : 'Mode gelap'}
+            aria-label={dark ? (lang === 'en' ? 'Light mode' : 'Mode terang') : (lang === 'en' ? 'Dark mode' : 'Mode gelap')}
           >
             {dark ? '☀' : '☾'}
           </button>

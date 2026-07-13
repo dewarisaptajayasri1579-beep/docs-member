@@ -1,5 +1,9 @@
 import { RolesDiagram } from '@/components/roles-diagram'
 
+export function generateStaticParams() {
+  return [{ lang: 'id' }, { lang: 'en' }]
+}
+
 export const metadata = {
   title: 'Roles Flow — MemberHub Docs',
   description: 'Diagram interaktif hierarki roles dan permission',
