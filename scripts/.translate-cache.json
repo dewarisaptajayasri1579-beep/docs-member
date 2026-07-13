@@ -6,5 +6,21 @@
   "02-users-and-roles/01-user-roles.md": "c3d15207103dfb9fc988e25e8fc5788f",
   "02-users-and-roles/02-access-permission.md": "19706c7f79e184cf8a47357368083b8e",
   "02-users-and-roles/03-roles-flow.md": "95569c54fab4144bf52791412f204da2",
-  "03-business-flows/checkout-flow.md": "663d099f767cead4ed9bcf6697fc7b90"
+  "03-business-flows/checkout-flow.md": "663d099f767cead4ed9bcf6697fc7b90",
+  "03-business-flows/exception-flow.md": "1842b2f85fb587a3a2fd6a04317f1344",
+  "03-business-flows/sso-auth-flow.md": "d4e7dd2fc380db9f05721a1f68e322fd",
+  "04-features/billing-plans.md": "3573fe627e1ba111e296947d0d377038",
+  "04-features/license-management.md": "2ed86d6617a9316f688577c4cbf9ef01",
+  "04-features/payment-gateway.md": "7e6512c17c856c32572b5546d5aa7dd5",
+  "04-features/sso-oauth-server.md": "c10fe21f5973b5c6cd0c9672f7792620",
+  "04-features/user-registration.md": "f0e3b94903f11768311e48b11e378788",
+  "05-business-rules/membership-rules.md": "2c08e1b88107b905e1a1b8a9a2bdb3f7",
+  "06-ui-ux/design-guideline.md": "b408c29fd7b809efe0ee9a25d23f5b6c",
+  "06-ui-ux/screen-list.md": "449e4c2b94c1212eada4db78d6c37941",
+  "07-database/data-dictionary.md": "608b625435d05c7c86200dbd379af5a8",
+  "07-database/erd.md": "37d8a7d62ac3e7ec5898fd248e2115d2",
+  "07-database/tables.md": "d65da30c0bc73bd5082896ecebc87691",
+  "08-api/api-overview.md": "4932322f30da33debe849f55e90fa0e6",
+  "08-api/endpoints.md": "31baf7ba612faf9082a3aee9f10beb74",
+  "09-technical/deployment.md": "2de2a68251168a692ceeafd56449e9a6"
 }

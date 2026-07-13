@@ -221,7 +221,8 @@ function SvgEdge({ e }: { e: E }) {
 }
 
 /* ── Main component ────────────────────────────────────────── */
-export function FlowDiagram() {
+export function FlowDiagram({ lang = 'id' }: { lang?: string }) {
+  const isEn = lang === 'en'
   const [tab, setTab] = useState(0)
   const [active, setActive] = useState<string | null>(null)
   const flow = FLOWS[tab]
@@ -233,9 +234,9 @@ export function FlowDiagram() {
     <section className="fd-wrap" aria-labelledby="fd-heading">
       <div className="fd-header">
         <div>
-          <span className="eyebrow">Diagram Alur Interaktif</span>
-          <h2 id="fd-heading">Visualisasi Sistem Membership</h2>
-          <p>Klik node untuk melihat detail teknis setiap tahap.</p>
+          <span className="eyebrow">{isEn ? 'Interactive Flow Diagram' : 'Diagram Alur Interaktif'}</span>
+          <h2 id="fd-heading">{isEn ? 'Membership System Visualization' : 'Visualisasi Sistem Membership'}</h2>
+          <p>{isEn ? 'Click a node to view technical details of each stage.' : 'Klik node untuk melihat detail teknis setiap tahap.'}</p>
         </div>
         <nav className="fd-tabs" role="tablist">
           {FLOWS.map((f, i) => (
@@ -246,7 +247,7 @@ export function FlowDiagram() {
               className={`fd-tab${tab === i ? ' active' : ''}`}
               onClick={() => handleTabChange(i)}
             >
-              <span>{f.emoji}</span> {f.title}
+              <span>{f.emoji}</span> {isEn ? (i === 0 ? 'Registration' : i === 1 ? 'Activation' : i === 2 ? 'SSO Login' : 'Lifecycle') : f.title}
             </button>
           ))}
         </nav>
@@ -277,34 +278,34 @@ export function FlowDiagram() {
           {activeNode ? (
             <>
               <div className="fd-info-badge" data-kind={activeNode.kind}>
-                {activeNode.kind === 'ok' ? '✓ Sukses'
-                  : activeNode.kind === 'fail' ? '✕ Error'
-                  : activeNode.kind === 'warn' ? '⚠ Peringatan'
-                  : activeNode.kind === 'dec' ? '◆ Keputusan'
-                  : activeNode.kind === 'sys' ? '⚙ Sistem'
+                {activeNode.kind === 'ok' ? (isEn ? '✓ Success' : '✓ Sukses')
+                  : activeNode.kind === 'fail' ? (isEn ? '✕ Error' : '✕ Error')
+                  : activeNode.kind === 'warn' ? (isEn ? '⚠ Warning' : '⚠ Peringatan')
+                  : activeNode.kind === 'dec' ? (isEn ? '◆ Decision' : '◆ Keputusan')
+                  : activeNode.kind === 'sys' ? (isEn ? '⚙ System' : '⚙ Sistem')
                   : activeNode.kind === 'pill' ? '● Start / End'
-                  : '→ Proses'}
+                  : (isEn ? '→ Process' : '→ Proses')}
               </div>
               <h3>{activeNode.label}</h3>
               {activeNode.sub && <p className="fd-info-sub">{activeNode.sub}</p>}
-              <p className="fd-info-desc">{activeNode.info ?? 'Tidak ada keterangan tambahan.'}</p>
+              <p className="fd-info-desc">{activeNode.info ?? (isEn ? 'No additional details.' : 'Tidak ada keterangan tambahan.')}</p>
             </>
           ) : (
             <div className="fd-info-empty">
               <span>👆</span>
-              <p>Klik salah satu node untuk melihat penjelasan teknisnya.</p>
+              <p>{isEn ? 'Click any node to view its technical explanation.' : 'Klik salah satu node untuk melihat penjelasan teknisnya.'}</p>
             </div>
           )}
 
           <div className="fd-legend">
-            <p>Keterangan warna:</p>
+            <p>{isEn ? 'Color Legend:' : 'Keterangan warna:'}</p>
             {([
-              ['ok',   'Berhasil'],
-              ['warn', 'Peringatan'],
-              ['fail', 'Error / Blokir'],
-              ['sys',  'Aksi Sistem'],
-              ['dec',  'Keputusan'],
-              ['step', 'Proses'],
+              ['ok',   isEn ? 'Success' : 'Berhasil'],
+              ['warn', isEn ? 'Warning' : 'Peringatan'],
+              ['fail', isEn ? 'Error / Blocked' : 'Error / Blokir'],
+              ['sys',  isEn ? 'System Action' : 'Aksi Sistem'],
+              ['dec',  isEn ? 'Decision' : 'Keputusan'],
+              ['step', isEn ? 'Process' : 'Proses'],
             ] as [Kind, string][]).map(([k, label]) => (
               <div key={k} className="fd-legend-item">
                 <span className="fd-dot" data-kind={k} />

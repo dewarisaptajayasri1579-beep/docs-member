@@ -73,7 +73,7 @@ export function DocsShell({ lang, navigation, children }: { lang: string; naviga
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Cari dokumentasi…"
+              placeholder={lang === 'en' ? 'Search documentation…' : 'Cari dokumentasi…'}
             />
             {query && (
               <button className="search-clear" type="button" onClick={() => setQuery('')}>✕</button>
@@ -93,7 +93,7 @@ export function DocsShell({ lang, navigation, children }: { lang: string; naviga
                 {isOpen && (
                   <div className="section-items">
                     {section.items.map(item => {
-                      const href = `/docs/${item.slug.join('/')}`
+                      const href = `/${lang}/docs/${item.slug.join('/')}`
                       const isActive = pathname === href
                       return (
                         <Link key={href} href={href} className={`nav-link${isActive ? ' active' : ''}`}>

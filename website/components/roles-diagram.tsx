@@ -135,7 +135,8 @@ function SvgEdge({ e }: { e: E }) {
 }
 
 /* ── Main Component ────────────────────────────────────────── */
-export function RolesDiagram() {
+export function RolesDiagram({ lang = 'id' }: { lang?: string }) {
+  const isEn = lang === 'en'
   const [tab, setTab] = useState(0)
   const [active, setActive] = useState<string | null>(null)
   const flow = FLOWS[tab]
@@ -147,14 +148,14 @@ export function RolesDiagram() {
     <section className="fd-wrap">
       <div className="fd-header">
         <div>
-          <span className="eyebrow">Diagram Hak Akses & Peran</span>
+          <span className="eyebrow">{isEn ? 'Access & Role Diagram' : 'Diagram Hak Akses & Peran'}</span>
           <h2>Users & Roles</h2>
-          <p>Klik node untuk melihat detail aturan akses.</p>
+          <p>{isEn ? 'Click a node to view access details.' : 'Klik node untuk melihat detail aturan akses.'}</p>
         </div>
         <nav className="fd-tabs">
           {FLOWS.map((f, i) => (
             <button key={f.id} className={`fd-tab${tab === i ? ' active' : ''}`} onClick={() => handleTab(i)}>
-              <span>{f.emoji}</span> {f.title}
+              <span>{f.emoji}</span> {isEn ? (i === 0 ? 'Role Hierarchy' : i === 1 ? 'Access Matrix' : 'Account Lifecycle') : f.title}
             </button>
           ))}
         </nav>
@@ -179,14 +180,14 @@ export function RolesDiagram() {
           ) : (
             <div className="fd-info-empty">
               <span>👆</span>
-              <p>Klik salah satu peran atau node untuk melihat batas hak akses.</p>
+              <p>{isEn ? 'Click a role or node to view access limits.' : 'Klik salah satu peran atau node untuk melihat batas hak akses.'}</p>
             </div>
           )}
           
           <div className="fd-legend">
-            <p>Role Colors:</p>
+            <p>{isEn ? 'Role Colors:' : 'Warna Peran:'}</p>
             <div className="fd-legend-item"><span className="fd-dot" data-kind="admin" /> Super Admin</div>
-            <div className="fd-legend-item"><span className="fd-dot" data-kind="member" style={{ background: '#a78bfa' }} /> Member / Data Owner</div>
+            <div className="fd-legend-item"><span className="fd-dot" data-kind="member" style={{ background: '#a78bfa' }} /> Member / {isEn ? 'Data Owner' : 'Pemilik Data'}</div>
             <div className="fd-legend-item"><span className="fd-dot" data-kind="sys" /> System / Bot</div>
           </div>
         </aside>

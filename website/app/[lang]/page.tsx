@@ -6,17 +6,23 @@ export function generateStaticParams() {
   return [{ lang: 'id' }, { lang: 'en' }]
 }
 
-const highlights = [
-  ['Untuk semua orang', 'Pahami alur registrasi, lisensi, pembayaran, dan SSO tanpa istilah teknis yang rumit.'],
-  ['Untuk developer', 'Akses detail API, database, arsitektur NestJS, Redis/BullMQ, OAuth2, dan skenario testing.'],
-  ['Selalu terlacak', 'Lihat riwayat perubahan dan pilih versi dokumentasi sesuai kebutuhan integrasi.'],
-]
+
 
 export default async function HomePage(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params
   const lang = params.lang || 'id'
   const isEn = lang === 'en'
   const firstDocument = getNavigation(lang)[0]?.items[0]
+
+  const highlights = isEn ? [
+    ['For everyone', 'Understand registration, licensing, payments, and SSO flows without complex technical jargon.'],
+    ['For developers', 'Access API details, database schemas, NestJS architecture, Redis/BullMQ, OAuth2, and testing scenarios.'],
+    ['Always tracked', 'View change history and select the documentation version that fits your integration needs.'],
+  ] : [
+    ['Untuk semua orang', 'Pahami alur registrasi, lisensi, pembayaran, dan SSO tanpa istilah teknis yang rumit.'],
+    ['Untuk developer', 'Akses detail API, database, arsitektur NestJS, Redis/BullMQ, OAuth2, dan skenario testing.'],
+    ['Selalu terlacak', 'Lihat riwayat perubahan dan pilih versi dokumentasi sesuai kebutuhan integrasi.'],
+  ]
 
   return (
     <main className="home">
@@ -60,7 +66,7 @@ export default async function HomePage(props: { params: Promise<{ lang: string }
         </ol>
       </section>
 
-      <FlowExplorer />
+      <FlowExplorer lang={lang} />
     </main>
   )
 }
