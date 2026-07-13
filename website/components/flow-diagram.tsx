@@ -28,20 +28,20 @@ const STYLE: Record<Kind, { fill: string; stroke: string; text: string; sub: str
 }
 
 /* ── Flow data ─────────────────────────────────────────────── */
-const FLOWS: Flow[] = [
+const getFlows = (isEn: boolean): Flow[] => [
   /* ── 1. REGISTRASI ───────────────────────────────────────── */
   {
-    id: 'reg', emoji: '👤', title: 'Registrasi',
+    id: 'reg', emoji: '👤', title: isEn ? 'Registration' : 'Registrasi',
     vb: '0 0 680 548',
     nodes: [
-      { id:'s', cx:340,cy:26, w:150,h:32, kind:'pill', label:'Pengguna Baru', info:'Calon member membuka platform untuk pertama kali.' },
-      { id:'f', cx:340,cy:94, w:280,h:42, kind:'step', label:'Isi Form Registrasi', sub:'Nama · Email · Password', info:'Validasi: email unik, password min. 8 karakter. Error inline per field.' },
-      { id:'c', cx:340,cy:162,w:280,h:42, kind:'sys',  label:'Akun dibuat (unverified)', sub:'POST /api/v1/auth/register', info:'Password di-hash dengan Argon2. Akun belum bisa login sebelum email diverifikasi.' },
-      { id:'e', cx:340,cy:230,w:280,h:42, kind:'sys',  label:'Email verifikasi dikirim', sub:'via BullMQ · expires 24 jam', info:'Email dikirim secara async. Token unik hanya berlaku sekali dan 24 jam.' },
-      { id:'k', cx:340,cy:298,w:280,h:42, kind:'step', label:'Klik tautan verifikasi', info:'Member membuka link di email. Token dicocokkan di server.' },
-      { id:'v', cx:340,cy:374,w:280,h:42, kind:'dec',  label:'Token valid & belum dipakai?', info:'Pengecekan: token ada, belum used_at, belum expired.' },
-      { id:'a', cx:170,cy:466,w:210,h:42, kind:'ok',   label:'Akun AKTIF ✓', sub:'Status: active', info:'Member dapat login, aktivasi produk, dan checkout.' },
-      { id:'r', cx:530,cy:466,w:185,h:42, kind:'warn', label:'Kirim ulang email', sub:'Cooldown: 60 detik', info:'Token lama diinvalidasi. Email baru dikirim via queue.' },
+      { id:'s', cx:340,cy:26, w:150,h:32, kind:'pill', label:isEn ? 'New User' : 'Pengguna Baru', info:isEn ? 'Potential member opens the platform for the first time.' : 'Calon member membuka platform untuk pertama kali.' },
+      { id:'f', cx:340,cy:94, w:280,h:42, kind:'step', label:isEn ? 'Fill Registration Form' : 'Isi Form Registrasi', sub:'Name · Email · Password', info:isEn ? 'Validation: unique email, min 8 chars password. Inline errors.' : 'Validasi: email unik, password min. 8 karakter. Error inline per field.' },
+      { id:'c', cx:340,cy:162,w:280,h:42, kind:'sys',  label:isEn ? 'Account Created (Unverified)' : 'Akun dibuat (unverified)', sub:'POST /api/v1/auth/register', info:isEn ? 'Password hashed with Argon2. Cannot login until email is verified.' : 'Password di-hash dengan Argon2. Akun belum bisa login sebelum email diverifikasi.' },
+      { id:'e', cx:340,cy:230,w:280,h:42, kind:'sys',  label:isEn ? 'Verification Email Sent' : 'Email verifikasi dikirim', sub:'via BullMQ · expires 24h', info:isEn ? 'Email sent asynchronously. Unique token valid for 24 hours.' : 'Email dikirim secara async. Token unik hanya berlaku sekali dan 24 jam.' },
+      { id:'k', cx:340,cy:298,w:280,h:42, kind:'step', label:isEn ? 'Click Verification Link' : 'Klik tautan verifikasi', info:isEn ? 'Member opens link in email. Token is verified on the server.' : 'Member membuka link di email. Token dicocokkan di server.' },
+      { id:'v', cx:340,cy:374,w:280,h:42, kind:'dec',  label:isEn ? 'Token valid & unused?' : 'Token valid & belum dipakai?', info:isEn ? 'Checks if token exists, not used_at, and not expired.' : 'Pengecekan: token ada, belum used_at, belum expired.' },
+      { id:'a', cx:170,cy:466,w:210,h:42, kind:'ok',   label:isEn ? 'Account ACTIVE ✓' : 'Akun AKTIF ✓', sub:'Status: active', info:isEn ? 'Member can login, activate products, and checkout.' : 'Member dapat login, aktivasi produk, dan checkout.' },
+      { id:'r', cx:530,cy:466,w:185,h:42, kind:'warn', label:isEn ? 'Resend Email' : 'Kirim ulang email', sub:'Cooldown: 60 seconds', info:isEn ? 'Old token invalidated. New email sent via queue.' : 'Token lama diinvalidasi. Email baru dikirim via queue.' },
     ],
     edges: [
       { pts:[[340,42],[340,73]] },
@@ -49,31 +49,31 @@ const FLOWS: Flow[] = [
       { pts:[[340,183],[340,209]] },
       { pts:[[340,251],[340,277]] },
       { pts:[[340,319],[340,353]] },
-      { pts:[[340,395],[340,436],[170,436],[170,445]], label:'Ya', lx:240, ly:430 },
-      { pts:[[340,395],[340,436],[530,436],[530,445]], label:'Tidak', lx:442, ly:430 },
-      { pts:[[530,487],[635,487],[635,219],[481,219]], label:'↑ coba lagi', lx:635, ly:350, back:true },
+      { pts:[[340,395],[340,436],[170,436],[170,445]], label:isEn ? 'Yes' : 'Ya', lx:240, ly:430 },
+      { pts:[[340,395],[340,436],[530,436],[530,445]], label:isEn ? 'No' : 'Tidak', lx:442, ly:430 },
+      { pts:[[530,487],[635,487],[635,219],[481,219]], label:isEn ? '↑ try again' : '↑ coba lagi', lx:635, ly:350, back:true },
     ],
   },
 
   /* ── 2. AKTIVASI LISENSI ─────────────────────────────────── */
   {
-    id: 'act', emoji: '🔑', title: 'Aktivasi',
+    id: 'act', emoji: '🔑', title: isEn ? 'Activation' : 'Aktivasi',
     vb: '0 0 820 570',
     nodes: [
-      { id:'p', cx:410,cy:26, w:220,h:42, kind:'step', label:'Pilih Produk', sub:'dari Katalog SaaS', info:'Hanya produk aktif yang ditampilkan. Produk yang sudah diaktifkan ditandai "Sudah Aktif".' },
-      { id:'t', cx:410,cy:96, w:220,h:42, kind:'step', label:'Pilih Paket', info:'Free Forever, Pro Monthly, atau Pro Yearly. Harga disimpan sebagai snapshot saat order dibuat.' },
-      { id:'q', cx:410,cy:172,w:220,h:42, kind:'dec',  label:'Paket Free Forever?', info:'Paket free tidak memerlukan pembayaran. Langsung dibuat tanpa order/payment.' },
-      { id:'fa',cx:155,cy:270,w:200,h:42, kind:'sys',  label:'Aktivasi Langsung', sub:'POST /licenses/activate-free', info:'Lisensi active_free dibuat. License-ID unik di-generate dan dikirim via email.' },
-      { id:'or',cx:655,cy:270,w:210,h:42, kind:'step', label:'Buat Order', sub:'Header: Idempotency-Key', info:'Cek idempotency key mencegah order duplikat. Status: pending_payment.' },
-      { id:'py',cx:655,cy:346,w:210,h:42, kind:'step', label:'Bayar di Gateway', sub:'Midtrans / Xendit', info:'Member diarahkan ke hosted payment page. Mendukung Transfer, GoPay, OVO, QRIS.' },
-      { id:'wh',cx:655,cy:422,w:210,h:42, kind:'sys',  label:'Webhook Settlement', sub:'Validasi signature + amount', info:'Atomik: payment, order, license, dan audit log berhasil bersama atau gagal bersama.' },
-      { id:'li',cx:410,cy:524,w:240,h:44, kind:'ok',   label:'Lisensi AKTIF ✓', sub:'NTO-XXXX-XXXX-XXXX', info:'License-ID tidak berubah saat renewal. Free = active_free, Paid = active.' },
+      { id:'p', cx:410,cy:26, w:220,h:42, kind:'step', label:isEn ? 'Select Product' : 'Pilih Produk', sub:isEn ? 'from SaaS Catalog' : 'dari Katalog SaaS', info:isEn ? 'Only active products shown. Purchased products marked as "Active".' : 'Hanya produk aktif yang ditampilkan. Produk yang sudah diaktifkan ditandai "Sudah Aktif".' },
+      { id:'t', cx:410,cy:96, w:220,h:42, kind:'step', label:isEn ? 'Select Plan' : 'Pilih Paket', info:isEn ? 'Free Forever, Pro Monthly, or Pro Yearly. Prices are snapshotted.' : 'Free Forever, Pro Monthly, atau Pro Yearly. Harga disimpan sebagai snapshot saat order dibuat.' },
+      { id:'q', cx:410,cy:172,w:220,h:42, kind:'dec',  label:isEn ? 'Free Forever Plan?' : 'Paket Free Forever?', info:isEn ? 'Free plans skip payment and activate directly.' : 'Paket free tidak memerlukan pembayaran. Langsung dibuat tanpa order/payment.' },
+      { id:'fa',cx:155,cy:270,w:200,h:42, kind:'sys',  label:isEn ? 'Direct Activation' : 'Aktivasi Langsung', sub:'POST /licenses/activate-free', info:isEn ? 'active_free license created. Unique License-ID generated.' : 'Lisensi active_free dibuat. License-ID unik di-generate dan dikirim via email.' },
+      { id:'or',cx:655,cy:270,w:210,h:42, kind:'step', label:isEn ? 'Create Order' : 'Buat Order', sub:'Header: Idempotency-Key', info:isEn ? 'Idempotency key prevents duplicates. Status: pending_payment.' : 'Cek idempotency key mencegah order duplikat. Status: pending_payment.' },
+      { id:'py',cx:655,cy:346,w:210,h:42, kind:'step', label:isEn ? 'Pay at Gateway' : 'Bayar di Gateway', sub:'Midtrans / Xendit', info:isEn ? 'User redirected to hosted payment page.' : 'Member diarahkan ke hosted payment page. Mendukung Transfer, GoPay, OVO, QRIS.' },
+      { id:'wh',cx:655,cy:422,w:210,h:42, kind:'sys',  label:isEn ? 'Webhook Settlement' : 'Webhook Settlement', sub:isEn ? 'Validate signature + amount' : 'Validasi signature + amount', info:isEn ? 'Atomic: payment, order, license updated together.' : 'Atomik: payment, order, license, dan audit log berhasil bersama atau gagal bersama.' },
+      { id:'li',cx:410,cy:524,w:240,h:44, kind:'ok',   label:isEn ? 'License ACTIVE ✓' : 'Lisensi AKTIF ✓', sub:'NTO-XXXX-XXXX-XXXX', info:isEn ? 'License-ID unchanged on renewal.' : 'License-ID tidak berubah saat renewal. Free = active_free, Paid = active.' },
     ],
     edges: [
       { pts:[[410,47],[410,75]] },
       { pts:[[410,117],[410,151]] },
-      { pts:[[410,193],[410,232],[155,232],[155,249]], label:'Ya (Free)', lx:256, ly:226 },
-      { pts:[[410,193],[410,232],[655,232],[655,249]], label:'Tidak (Paid)', lx:540, ly:226 },
+      { pts:[[410,193],[410,232],[155,232],[155,249]], label:isEn ? 'Yes (Free)' : 'Ya (Free)', lx:256, ly:226 },
+      { pts:[[410,193],[410,232],[655,232],[655,249]], label:isEn ? 'No (Paid)' : 'Tidak (Paid)', lx:540, ly:226 },
       { pts:[[655,291],[655,325]] },
       { pts:[[655,367],[655,401]] },
       { pts:[[155,291],[155,502],[290,502]] },
@@ -83,25 +83,25 @@ const FLOWS: Flow[] = [
 
   /* ── 3. SSO LOGIN ────────────────────────────────────────── */
   {
-    id: 'sso', emoji: '🔐', title: 'SSO Login',
+    id: 'sso', emoji: '🔐', title: isEn ? 'SSO Login' : 'SSO Login',
     vb: '0 0 700 580',
     nodes: [
-      { id:'o', cx:350,cy:26, w:220,h:42, kind:'step', label:'Buka Produk SaaS', info:'Member klik "Buka Aplikasi" dari dashboard Hub.' },
-      { id:'a', cx:350,cy:96, w:240,h:42, kind:'sys',  label:'Redirect ke /oauth/authorize', sub:'PKCE + state + scope', info:'SaaS mengirim code_challenge PKCE. Hub memvalidasi client_id dan redirect_uri.' },
-      { id:'v', cx:350,cy:166,w:240,h:42, kind:'sys',  label:'Hub validasi sesi & lisensi', info:'Cek: akun active, lisensi active/active_free/grace_period untuk produk ini.' },
-      { id:'q', cx:350,cy:242,w:200,h:42, kind:'dec',  label:'Akses diizinkan?', info:'Lisensi suspended, tidak ada, atau akun non-active → ditolak.' },
-      { id:'c', cx:165,cy:334,w:200,h:42, kind:'sys',  label:'Authorization Code', sub:'Sekali pakai · ~1 menit', info:'Code-hash disimpan di DB. Terikat pada client, redirect URI, dan PKCE.' },
-      { id:'x', cx:545,cy:334,w:175,h:42, kind:'fail', label:'Akses Ditolak', sub:'403 license_inactive', info:'Token tidak diterbitkan. SaaS menampilkan pesan error yang sesuai.' },
-      { id:'t', cx:165,cy:410,w:200,h:42, kind:'sys',  label:'Token Exchange', sub:'POST /oauth/token', info:'Code ditukar dengan access token + refresh token. Code langsung di-mark used.' },
-      { id:'j', cx:165,cy:486,w:200,h:42, kind:'ok',   label:'JWT RS256 ✓', sub:'Berlaku 1 jam', info:'Claim: member_id, email, license_key, tier, product. SaaS verifikasi via JWKS.' },
-      { id:'ac',cx:165,cy:542,w:200,h:42, kind:'pill', label:'🎉 Akses Produk', info:'Member menggunakan SaaS tanpa login ulang. Refresh token dapat memperbarui akses.' },
+      { id:'o', cx:350,cy:26, w:220,h:42, kind:'step', label:isEn ? 'Open SaaS App' : 'Buka Produk SaaS', info:isEn ? 'User clicks "Open App" from Hub dashboard.' : 'Member klik "Buka Aplikasi" dari dashboard Hub.' },
+      { id:'a', cx:350,cy:96, w:240,h:42, kind:'sys',  label:isEn ? 'Redirect to /oauth' : 'Redirect ke /oauth/authorize', sub:'PKCE + state + scope', info:isEn ? 'Hub validates client_id and redirect_uri.' : 'SaaS mengirim code_challenge PKCE. Hub memvalidasi client_id dan redirect_uri.' },
+      { id:'v', cx:350,cy:166,w:240,h:42, kind:'sys',  label:isEn ? 'Validate Session & License' : 'Hub validasi sesi & lisensi', info:isEn ? 'Check: active account and valid license.' : 'Cek: akun active, lisensi active/active_free/grace_period untuk produk ini.' },
+      { id:'q', cx:350,cy:242,w:200,h:42, kind:'dec',  label:isEn ? 'Access Granted?' : 'Akses diizinkan?', info:isEn ? 'Suspended or missing license → denied.' : 'Lisensi suspended, tidak ada, atau akun non-active → ditolak.' },
+      { id:'c', cx:165,cy:334,w:200,h:42, kind:'sys',  label:isEn ? 'Authorization Code' : 'Authorization Code', sub:isEn ? 'One-time · ~1 min' : 'Sekali pakai · ~1 menit', info:isEn ? 'Code hashed in DB. Bound to client and PKCE.' : 'Code-hash disimpan di DB. Terikat pada client, redirect URI, dan PKCE.' },
+      { id:'x', cx:545,cy:334,w:175,h:42, kind:'fail', label:isEn ? 'Access Denied' : 'Akses Ditolak', sub:'403 license_inactive', info:isEn ? 'No token issued. SaaS shows error.' : 'Token tidak diterbitkan. SaaS menampilkan pesan error yang sesuai.' },
+      { id:'t', cx:165,cy:410,w:200,h:42, kind:'sys',  label:isEn ? 'Token Exchange' : 'Token Exchange', sub:'POST /oauth/token', info:isEn ? 'Code exchanged for access + refresh token.' : 'Code ditukar dengan access token + refresh token. Code langsung di-mark used.' },
+      { id:'j', cx:165,cy:486,w:200,h:42, kind:'ok',   label:'JWT RS256 ✓', sub:isEn ? 'Valid for 1 hour' : 'Berlaku 1 jam', info:isEn ? 'Claims: member_id, license_key. Verified via JWKS.' : 'Claim: member_id, email, license_key, tier, product. SaaS verifikasi via JWKS.' },
+      { id:'ac',cx:165,cy:542,w:200,h:42, kind:'pill', label:isEn ? '🎉 App Access' : '🎉 Akses Produk', info:isEn ? 'User accesses SaaS smoothly.' : 'Member menggunakan SaaS tanpa login ulang. Refresh token dapat memperbarui akses.' },
     ],
     edges: [
       { pts:[[350,47],[350,75]] },
       { pts:[[350,117],[350,145]] },
       { pts:[[350,187],[350,221]] },
-      { pts:[[350,263],[350,308],[165,308],[165,313]], label:'Ya', lx:238, ly:303 },
-      { pts:[[350,263],[350,308],[545,308],[545,313]], label:'Tidak', lx:455, ly:303 },
+      { pts:[[350,263],[350,308],[165,308],[165,313]], label:isEn ? 'Yes' : 'Ya', lx:238, ly:303 },
+      { pts:[[350,263],[350,308],[545,308],[545,313]], label:isEn ? 'No' : 'Tidak', lx:455, ly:303 },
       { pts:[[165,355],[165,389]] },
       { pts:[[165,431],[165,465]] },
       { pts:[[165,507],[165,521]] },
@@ -113,21 +113,21 @@ const FLOWS: Flow[] = [
     id: 'lc', emoji: '🔄', title: 'Lifecycle',
     vb: '0 0 720 530',
     nodes: [
-      { id:'a', cx:360,cy:30, w:220,h:44, kind:'ok',   label:'Lisensi AKTIF', sub:'active / active_free', info:'Lisensi berjalan normal. SSO bisa diterbitkan. Free Forever tidak punya expiry.' },
-      { id:'q', cx:360,cy:114,w:230,h:42, kind:'dec',  label:'expired_at tercapai?', info:'Job scheduler berjalan setiap hari untuk memeriksa lisensi yang mendekati expired. Free Forever tidak terpengaruh.' },
-      { id:'g', cx:360,cy:210,w:230,h:44, kind:'warn', label:'Grace Period ⏳', sub:'7 hari tersisa · akses masih jalan', info:'Akses SSO masih berjalan selama grace period. Hub mengirim email pengingat. Banner peringatan tampil di dashboard.' },
-      { id:'p', cx:360,cy:300,w:210,h:42, kind:'dec',  label:'Diperpanjang sebelum habis?', info:'Member melakukan checkout baru sebelum grace period berakhir.' },
-      { id:'r', cx:155,cy:394,w:190,h:44, kind:'ok',   label:'Kembali Aktif ✓', sub:'expiry dihitung ulang', info:'Lisensi kembali ke status active. License-ID tetap sama.' },
-      { id:'s', cx:560,cy:394,w:185,h:44, kind:'fail', label:'Suspended ✕', sub:'Akses & SSO diblokir', info:'SSO menolak token baru. Access token yang sudah ada tetap valid hingga exp-nya habis.' },
-      { id:'ad',cx:560,cy:478,w:185,h:42, kind:'sys',  label:'Admin reaktifkan', sub:'atau member bayar tagihan', info:'Super Admin dapat mengaktifkan kembali lisensi secara manual melalui dashboard admin.' },
+      { id:'a', cx:360,cy:30, w:220,h:44, kind:'ok',   label:isEn ? 'License ACTIVE' : 'Lisensi AKTIF', sub:'active / active_free', info:isEn ? 'License normal. Free Forever never expires.' : 'Lisensi berjalan normal. SSO bisa diterbitkan. Free Forever tidak punya expiry.' },
+      { id:'q', cx:360,cy:114,w:230,h:42, kind:'dec',  label:isEn ? 'expired_at reached?' : 'expired_at tercapai?', info:isEn ? 'Job scheduler checks daily.' : 'Job scheduler berjalan setiap hari untuk memeriksa lisensi yang mendekati expired. Free Forever tidak terpengaruh.' },
+      { id:'g', cx:360,cy:210,w:230,h:44, kind:'warn', label:isEn ? 'Grace Period ⏳' : 'Grace Period ⏳', sub:isEn ? '7 days left · access works' : '7 hari tersisa · akses masih jalan', info:isEn ? 'SSO still works. Reminder emails sent.' : 'Akses SSO masih berjalan selama grace period. Hub mengirim email pengingat. Banner peringatan tampil di dashboard.' },
+      { id:'p', cx:360,cy:300,w:210,h:42, kind:'dec',  label:isEn ? 'Renewed before end?' : 'Diperpanjang sebelum habis?', info:isEn ? 'Member creates new checkout before grace period ends.' : 'Member melakukan checkout baru sebelum grace period berakhir.' },
+      { id:'r', cx:155,cy:394,w:190,h:44, kind:'ok',   label:isEn ? 'Active Again ✓' : 'Kembali Aktif ✓', sub:isEn ? 'expiry recalculated' : 'expiry dihitung ulang', info:isEn ? 'Status active. License-ID unchanged.' : 'Lisensi kembali ke status active. License-ID tetap sama.' },
+      { id:'s', cx:560,cy:394,w:185,h:44, kind:'fail', label:isEn ? 'Suspended ✕' : 'Suspended ✕', sub:isEn ? 'SSO Blocked' : 'Akses & SSO diblokir', info:isEn ? 'SSO rejects new tokens.' : 'SSO menolak token baru. Access token yang sudah ada tetap valid hingga exp-nya habis.' },
+      { id:'ad',cx:560,cy:478,w:185,h:42, kind:'sys',  label:isEn ? 'Admin reactivates' : 'Admin reaktifkan', sub:isEn ? 'or member pays bill' : 'atau member bayar tagihan', info:isEn ? 'Super Admin can reactivate manually.' : 'Super Admin dapat mengaktifkan kembali lisensi secara manual melalui dashboard admin.' },
     ],
     edges: [
       { pts:[[360,52],[360,93]] },
-      { pts:[[360,135],[360,188]], label:'Ya → paid license', lx:370, ly:158 },
+      { pts:[[360,135],[360,188]], label:isEn ? 'Yes → paid' : 'Ya → paid license', lx:370, ly:158 },
       { pts:[[360,232],[360,279]] },
-      { pts:[[360,321],[360,364],[155,364],[155,372]], label:'Ya', lx:234, ly:358 },
-      { pts:[[360,321],[360,364],[560,364],[560,372]], label:'Tidak', lx:468, ly:358 },
-      { pts:[[155,416],[155,460],[295,460]], back:true, label:'↑ loop ke aktif', lx:80, ly:440 },
+      { pts:[[360,321],[360,364],[155,364],[155,372]], label:isEn ? 'Yes' : 'Ya', lx:234, ly:358 },
+      { pts:[[360,321],[360,364],[560,364],[560,372]], label:isEn ? 'No' : 'Tidak', lx:468, ly:358 },
+      { pts:[[155,416],[155,460],[295,460]], back:true, label:isEn ? '↑ loop to active' : '↑ loop ke aktif', lx:80, ly:440 },
       { pts:[[560,438],[560,457]] },
       { pts:[[490,460],[295,460]], label:undefined },
     ],
@@ -225,7 +225,8 @@ export function FlowDiagram({ lang = 'id' }: { lang?: string }) {
   const isEn = lang === 'en'
   const [tab, setTab] = useState(0)
   const [active, setActive] = useState<string | null>(null)
-  const flow = FLOWS[tab]
+  const flowData = getFlows(isEn)
+  const flow = flowData[tab]
   const activeNode = flow.nodes.find(n => n.id === active)
 
   const handleTabChange = (i: number) => { setTab(i); setActive(null) }
@@ -239,7 +240,7 @@ export function FlowDiagram({ lang = 'id' }: { lang?: string }) {
           <p>{isEn ? 'Click a node to view technical details of each stage.' : 'Klik node untuk melihat detail teknis setiap tahap.'}</p>
         </div>
         <nav className="fd-tabs" role="tablist">
-          {FLOWS.map((f, i) => (
+          {flowData.map((f, i) => (
             <button
               key={f.id}
               role="tab"

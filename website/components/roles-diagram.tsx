@@ -28,43 +28,43 @@ const STYLE: Record<Kind, { fill: string; stroke: string; text: string; sub: str
 }
 
 /* ── Flow data ─────────────────────────────────────────────── */
-const FLOWS: TabFlow[] = [
+const getFlows = (isEn: boolean): TabFlow[] => [
   /* ── 1. HIERARKI ─────────────────────────────────────────── */
   {
-    id: 'hier', emoji: '👥', title: 'Hierarki Role',
+    id: 'hier', emoji: '👥', title: isEn ? 'Role Hierarchy' : 'Hierarki Role',
     vb: '0 0 700 420',
     nodes: [
-      { id: 'g', cx: 350, cy: 40, w: 220, h: 42, kind: 'guest', label: 'Guest (Unregistered)', info: 'Hanya dapat melihat halaman publik seperti katalog produk SaaS dan halaman registrasi.' },
-      { id: 'u', cx: 350, cy: 120, w: 220, h: 42, kind: 'guest', label: 'Unverified Member', info: 'Pengguna yang sudah mendaftar tetapi belum verifikasi email. Belum bisa login.' },
-      { id: 'm', cx: 350, cy: 220, w: 260, h: 46, kind: 'member', label: 'Member (Active)', sub: 'Pemilik Data', info: 'Dapat mengelola profil, checkout paket, aktivasi produk, dan login SSO ke aplikasi SaaS.' },
-      { id: 'a', cx: 350, cy: 340, w: 260, h: 46, kind: 'admin', label: 'Super Admin', sub: 'Pengelola Platform', info: 'Dapat mengelola produk, paket, melihat semua transaksi, dan mengaktifkan/menangguhkan member manual.' },
-      { id: 'sy',cx: 120, cy: 220, w: 140, h: 46, kind: 'sys', label: 'System Backend', sub: 'Otomasi', info: 'Menerima callback payment, menerbitkan JWT, dan menghitung expiry. Tidak punya UI.' },
-      { id: 'sa',cx: 580, cy: 220, w: 140, h: 46, kind: 'sys', label: 'SaaS App', sub: 'Target SSO', info: 'Aplikasi eksternal yang menerima login dari Member melalui Hub.' },
+      { id: 'g', cx: 350, cy: 40, w: 220, h: 42, kind: 'guest', label: isEn ? 'Guest (Unregistered)' : 'Guest (Unregistered)', info: isEn ? 'Can only see public pages like SaaS product catalog and registration.' : 'Hanya dapat melihat halaman publik seperti katalog produk SaaS dan halaman registrasi.' },
+      { id: 'u', cx: 350, cy: 120, w: 220, h: 42, kind: 'guest', label: isEn ? 'Unverified Member' : 'Unverified Member', info: isEn ? 'Registered user but email not yet verified. Cannot login.' : 'Pengguna yang sudah mendaftar tetapi belum verifikasi email. Belum bisa login.' },
+      { id: 'm', cx: 350, cy: 220, w: 260, h: 46, kind: 'member', label: isEn ? 'Member (Active)' : 'Member (Active)', sub: isEn ? 'Data Owner' : 'Pemilik Data', info: isEn ? 'Can manage profile, checkout plans, activate products, and SSO login to SaaS apps.' : 'Dapat mengelola profil, checkout paket, aktivasi produk, dan login SSO ke aplikasi SaaS.' },
+      { id: 'a', cx: 350, cy: 340, w: 260, h: 46, kind: 'admin', label: isEn ? 'Super Admin' : 'Super Admin', sub: isEn ? 'Platform Manager' : 'Pengelola Platform', info: isEn ? 'Can manage products, plans, view all transactions, and manually suspend members.' : 'Dapat mengelola produk, paket, melihat semua transaksi, dan mengaktifkan/menangguhkan member manual.' },
+      { id: 'sy',cx: 120, cy: 220, w: 140, h: 46, kind: 'sys', label: isEn ? 'System Backend' : 'System Backend', sub: isEn ? 'Automation' : 'Otomasi', info: isEn ? 'Receives payment callbacks, issues JWTs, calculates expiry. No UI.' : 'Menerima callback payment, menerbitkan JWT, dan menghitung expiry. Tidak punya UI.' },
+      { id: 'sa',cx: 580, cy: 220, w: 140, h: 46, kind: 'sys', label: isEn ? 'SaaS App' : 'SaaS App', sub: isEn ? 'SSO Target' : 'Target SSO', info: isEn ? 'External application receiving logins from Member via Hub.' : 'Aplikasi eksternal yang menerima login dari Member melalui Hub.' },
     ],
     edges: [
-      { pts: [[350, 61], [350, 99]], label: 'Register', lx: 385, ly: 84 },
-      { pts: [[350, 141], [350, 197]], label: 'Verify Email', lx: 395, ly: 174 },
-      { pts: [[350, 243], [350, 317]], label: 'Promote/Manage', lx: 405, ly: 284, back: true },
-      { pts: [[480, 220], [510, 220]], label: 'SSO Login', lx: 495, ly: 210 },
-      { pts: [[480, 340], [580, 340], [580, 243]], label: 'Kelola Integrasi', lx: 630, ly: 300, back: true },
-      { pts: [[220, 220], [190, 220]], label: 'Automate', lx: 205, ly: 210, back: true },
+      { pts: [[350, 61], [350, 99]], label: isEn ? 'Register' : 'Register', lx: 385, ly: 84 },
+      { pts: [[350, 141], [350, 197]], label: isEn ? 'Verify Email' : 'Verify Email', lx: 395, ly: 174 },
+      { pts: [[350, 243], [350, 317]], label: isEn ? 'Promote/Manage' : 'Promote/Manage', lx: 405, ly: 284, back: true },
+      { pts: [[480, 220], [510, 220]], label: isEn ? 'SSO Login' : 'SSO Login', lx: 495, ly: 210 },
+      { pts: [[480, 340], [580, 340], [580, 243]], label: isEn ? 'Manage Integration' : 'Kelola Integrasi', lx: 630, ly: 300, back: true },
+      { pts: [[220, 220], [190, 220]], label: isEn ? 'Automate' : 'Automate', lx: 205, ly: 210, back: true },
     ],
   },
   
   /* ── 2. IZIN & BATASAN ───────────────────────────────────── */
   {
-    id: 'perm', emoji: '🛡️', title: 'Matriks Akses',
+    id: 'perm', emoji: '🛡️', title: isEn ? 'Access Matrix' : 'Matriks Akses',
     vb: '0 0 720 480',
     nodes: [
-      { id: 'rm', cx: 160, cy: 80,  w: 180, h: 42, kind: 'member', label: 'Member Role', info: 'Hanya bisa mengakses datanya sendiri.' },
-      { id: 'ra', cx: 560, cy: 80,  w: 180, h: 42, kind: 'admin',  label: 'Admin Role', info: 'Akses penuh ke konfigurasi platform.' },
+      { id: 'rm', cx: 160, cy: 80,  w: 180, h: 42, kind: 'member', label: isEn ? 'Member Role' : 'Member Role', info: isEn ? 'Can only access their own data.' : 'Hanya bisa mengakses datanya sendiri.' },
+      { id: 'ra', cx: 560, cy: 80,  w: 180, h: 42, kind: 'admin',  label: isEn ? 'Admin Role' : 'Admin Role', info: isEn ? 'Full access to platform configuration.' : 'Akses penuh ke konfigurasi platform.' },
       
-      { id: 'p1', cx: 360, cy: 160, w: 260, h: 36, kind: 'ok',   label: '✓ Ubah Profil & Password', info: 'Member HANYA bisa mengubah profil sendiri. Admin BISA mengubah profil member.' },
-      { id: 'p2', cx: 360, cy: 210, w: 260, h: 36, kind: 'ok',   label: '✓ Lihat License-ID Sendiri', info: 'Member dapat melihat secret key lisensinya sendiri.' },
-      { id: 'p3', cx: 360, cy: 260, w: 260, h: 36, kind: 'fail', label: '✕ Lihat License-ID Orang Lain', info: 'Data Ownership: Member tidak bisa melihat data member lain.' },
-      { id: 'p4', cx: 360, cy: 310, w: 260, h: 36, kind: 'sys',  label: '⚙ Kelola Produk & Paket', info: 'Hanya Admin yang dapat membuat dan mengubah harga produk SaaS.' },
-      { id: 'p5', cx: 360, cy: 360, w: 260, h: 36, kind: 'warn', label: '⚠ Suspend Member Manual', info: 'Admin dapat memblokir akses member jika melanggar ketentuan.' },
-      { id: 'p6', cx: 360, cy: 410, w: 260, h: 36, kind: 'fail', label: '✕ Lihat Password User', info: 'Bahkan Admin tidak bisa melihat password member (di-hash dengan Argon2).' },
+      { id: 'p1', cx: 360, cy: 160, w: 260, h: 36, kind: 'ok',   label: isEn ? '✓ Edit Profile & Password' : '✓ Ubah Profil & Password', info: isEn ? 'Member can ONLY edit own profile. Admin CAN edit member profile.' : 'Member HANYA bisa mengubah profil sendiri. Admin BISA mengubah profil member.' },
+      { id: 'p2', cx: 360, cy: 210, w: 260, h: 36, kind: 'ok',   label: isEn ? '✓ View Own License-ID' : '✓ Lihat License-ID Sendiri', info: isEn ? 'Member can view their own license secret key.' : 'Member dapat melihat secret key lisensinya sendiri.' },
+      { id: 'p3', cx: 360, cy: 260, w: 260, h: 36, kind: 'fail', label: isEn ? '✕ View Other License-ID' : '✕ Lihat License-ID Orang Lain', info: isEn ? 'Data Ownership: Member cannot view other members data.' : 'Data Ownership: Member tidak bisa melihat data member lain.' },
+      { id: 'p4', cx: 360, cy: 310, w: 260, h: 36, kind: 'sys',  label: isEn ? '⚙ Manage Products & Plans' : '⚙ Kelola Produk & Paket', info: isEn ? 'Only Admin can create and change SaaS product prices.' : 'Hanya Admin yang dapat membuat dan mengubah harga produk SaaS.' },
+      { id: 'p5', cx: 360, cy: 360, w: 260, h: 36, kind: 'warn', label: isEn ? '⚠ Suspend Member' : '⚠ Suspend Member Manual', info: isEn ? 'Admin can block member access if terms are violated.' : 'Admin dapat memblokir akses member jika melanggar ketentuan.' },
+      { id: 'p6', cx: 360, cy: 410, w: 260, h: 36, kind: 'fail', label: isEn ? '✕ View User Password' : '✕ Lihat Password User', info: isEn ? 'Even Admin cannot see member password (hashed with Argon2).' : 'Bahkan Admin tidak bisa melihat password member (di-hash dengan Argon2).' },
     ],
     edges: [
       { pts: [[160, 101], [160, 160], [230, 160]] },
@@ -80,24 +80,24 @@ const FLOWS: TabFlow[] = [
 
   /* ── 3. LIFECYCLE AKUN ───────────────────────────────────── */
   {
-    id: 'life', emoji: '🔄', title: 'Siklus Akun',
+    id: 'life', emoji: '🔄', title: isEn ? 'Account Lifecycle' : 'Siklus Akun',
     vb: '0 0 700 460',
     nodes: [
-      { id: 'r', cx: 350, cy: 40,  w: 200, h: 42, kind: 'guest',  label: 'Registered', info: 'POST /api/v1/auth/register dipanggil.' },
-      { id: 'v', cx: 350, cy: 120, w: 200, h: 42, kind: 'sys',    label: 'Email Verification', sub: 'Token Exp: 24 jam', info: 'Menunggu klik tautan verifikasi.' },
-      { id: 'a', cx: 350, cy: 220, w: 240, h: 46, kind: 'member', label: 'Active Member', sub: 'Status: active', info: 'Siap melakukan checkout dan login SSO.' },
-      { id: 'w', cx: 160, cy: 320, w: 200, h: 42, kind: 'warn',   label: 'Violation Detected', info: 'Pelanggaran ToS atau abuse sistem.' },
-      { id: 's', cx: 350, cy: 400, w: 200, h: 46, kind: 'fail',   label: 'Suspended', sub: 'Akses SSO ditolak', info: 'Admin memblokir member. Semua sesi aktif digugurkan.' },
-      { id: 'x', cx: 540, cy: 320, w: 200, h: 42, kind: 'ok',     label: 'Admin Review', info: 'Admin meninjau akun.' },
+      { id: 'r', cx: 350, cy: 40,  w: 200, h: 42, kind: 'guest',  label: isEn ? 'Registered' : 'Registered', info: isEn ? 'POST /api/v1/auth/register called.' : 'POST /api/v1/auth/register dipanggil.' },
+      { id: 'v', cx: 350, cy: 120, w: 200, h: 42, kind: 'sys',    label: isEn ? 'Email Verification' : 'Email Verification', sub: isEn ? 'Token Exp: 24h' : 'Token Exp: 24 jam', info: isEn ? 'Waiting for verification link click.' : 'Menunggu klik tautan verifikasi.' },
+      { id: 'a', cx: 350, cy: 220, w: 240, h: 46, kind: 'member', label: isEn ? 'Active Member' : 'Active Member', sub: isEn ? 'Status: active' : 'Status: active', info: isEn ? 'Ready to checkout and SSO login.' : 'Siap melakukan checkout dan login SSO.' },
+      { id: 'w', cx: 160, cy: 320, w: 200, h: 42, kind: 'warn',   label: isEn ? 'Violation Detected' : 'Violation Detected', info: isEn ? 'ToS violation or system abuse.' : 'Pelanggaran ToS atau abuse sistem.' },
+      { id: 's', cx: 350, cy: 400, w: 200, h: 46, kind: 'fail',   label: isEn ? 'Suspended' : 'Suspended', sub: isEn ? 'SSO access denied' : 'Akses SSO ditolak', info: isEn ? 'Admin blocks member. All active sessions terminated.' : 'Admin memblokir member. Semua sesi aktif digugurkan.' },
+      { id: 'x', cx: 540, cy: 320, w: 200, h: 42, kind: 'ok',     label: isEn ? 'Admin Review' : 'Admin Review', info: isEn ? 'Admin reviews account.' : 'Admin meninjau akun.' },
     ],
     edges: [
       { pts: [[350, 61], [350, 99]] },
-      { pts: [[350, 141], [350, 197]], label: 'Klik Tautan', lx: 390, ly: 175 },
+      { pts: [[350, 141], [350, 197]], label: isEn ? 'Click Link' : 'Klik Tautan', lx: 390, ly: 175 },
       { pts: [[350, 243], [350, 320], [260, 320]] },
-      { pts: [[160, 341], [160, 400], [250, 400]], label: 'Block', lx: 185, ly: 380 },
-      { pts: [[450, 400], [540, 400], [540, 341]], label: 'Appeal', lx: 510, ly: 380 },
-      { pts: [[540, 299], [540, 220], [470, 220]], label: 'Unblock', lx: 510, ly: 250 },
-      { pts: [[350, 141], [480, 141], [480, 40], [450, 40]], label: 'Resend', lx: 450, ly: 130, back: true },
+      { pts: [[160, 341], [160, 400], [250, 400]], label: isEn ? 'Block' : 'Block', lx: 185, ly: 380 },
+      { pts: [[450, 400], [540, 400], [540, 341]], label: isEn ? 'Appeal' : 'Appeal', lx: 510, ly: 380 },
+      { pts: [[540, 299], [540, 220], [470, 220]], label: isEn ? 'Unblock' : 'Unblock', lx: 510, ly: 250 },
+      { pts: [[350, 141], [480, 141], [480, 40], [450, 40]], label: isEn ? 'Resend' : 'Resend', lx: 450, ly: 130, back: true },
     ],
   }
 ]
@@ -139,7 +139,8 @@ export function RolesDiagram({ lang = 'id' }: { lang?: string }) {
   const isEn = lang === 'en'
   const [tab, setTab] = useState(0)
   const [active, setActive] = useState<string | null>(null)
-  const flow = FLOWS[tab]
+  const flowData = getFlows(isEn)
+  const flow = flowData[tab]
   const activeNode = flow.nodes.find(n => n.id === active)
 
   const handleTab = (i: number) => { setTab(i); setActive(null) }
@@ -153,7 +154,7 @@ export function RolesDiagram({ lang = 'id' }: { lang?: string }) {
           <p>{isEn ? 'Click a node to view access details.' : 'Klik node untuk melihat detail aturan akses.'}</p>
         </div>
         <nav className="fd-tabs">
-          {FLOWS.map((f, i) => (
+          {flowData.map((f, i) => (
             <button key={f.id} className={`fd-tab${tab === i ? ' active' : ''}`} onClick={() => handleTab(i)}>
               <span>{f.emoji}</span> {isEn ? (i === 0 ? 'Role Hierarchy' : i === 1 ? 'Access Matrix' : 'Account Lifecycle') : f.title}
             </button>
