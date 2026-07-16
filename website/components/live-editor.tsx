@@ -2,6 +2,33 @@
 
 import { useState } from 'react'
 
+const dictionary: Record<string, Record<string, string>> = {
+  id: {
+    editPage: '📝 Edit Halaman Ini',
+    cancelEdit: 'Batal Edit',
+    enterPin: 'Masukkan PIN Editor untuk mengedit halaman ini:',
+    saving: 'Menyimpan...',
+    saveChanges: 'Simpan Perubahan',
+    successMsg: 'Berhasil disimpan ke GitHub! Halaman akan diperbarui setelah auto-deploy (sekitar 1-2 menit).'
+  },
+  en: {
+    editPage: '📝 Edit This Page',
+    cancelEdit: 'Cancel Edit',
+    enterPin: 'Enter Editor PIN to edit this page:',
+    saving: 'Saving...',
+    saveChanges: 'Save Changes',
+    successMsg: 'Successfully saved to GitHub! The page will be updated after auto-deploy (about 1-2 minutes).'
+  },
+  ja: {
+    editPage: '📝 このページを編集',
+    cancelEdit: '編集をキャンセル',
+    enterPin: 'このページを編集するにはエディターPINを入力してください:',
+    saving: '保存中...',
+    saveChanges: '変更を保存',
+    successMsg: 'GitHubに正常に保存されました！自動デプロイ後にページが更新されます（約1〜2分）。'
+  }
+}
+
 export function LiveEditor({ html, raw, filePath, lang }: { html: string, raw: string, filePath: string, lang: string }) {
   const [isEditing, setIsEditing] = useState(false)
   const [content, setContent] = useState(raw)
@@ -9,9 +36,11 @@ export function LiveEditor({ html, raw, filePath, lang }: { html: string, raw: s
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const t = dictionary[lang] || dictionary['id']
+
   const handleEditClick = () => {
     if (!isEditing) {
-      const enteredPin = prompt('Masukkan PIN Editor untuk mengedit halaman ini:')
+      const enteredPin = prompt(t.enterPin)
       if (enteredPin) {
         setPin(enteredPin)
         setIsEditing(true)
@@ -34,7 +63,7 @@ export function LiveEditor({ html, raw, filePath, lang }: { html: string, raw: s
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Gagal menyimpan')
       
-      alert('Berhasil disimpan ke GitHub! Halaman akan diperbarui setelah auto-deploy (sekitar 1-2 menit).')
+      alert(t.successMsg)
       setIsEditing(false)
     } catch (err: any) {
       setError(err.message)
@@ -58,7 +87,7 @@ export function LiveEditor({ html, raw, filePath, lang }: { html: string, raw: s
             fontSize: '12px'
           }}
         >
-          {isEditing ? 'Batal Edit' : '📝 Edit Halaman Ini'}
+          {isEditing ? t.cancelEdit : t.editPage}
         </button>
       </div>
 
@@ -94,7 +123,7 @@ export function LiveEditor({ html, raw, filePath, lang }: { html: string, raw: s
                 fontWeight: 'bold'
               }}
             >
-              {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
+              {isSaving ? t.saving : t.saveChanges}
             </button>
           </div>
         </div>
