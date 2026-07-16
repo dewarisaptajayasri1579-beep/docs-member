@@ -11,10 +11,11 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
 }
 
 export async function generateStaticParams() {
-  // Generate for both 'id' and 'en'
-  const slugs = getAllSlugs('id').map(slug => ({ slug, lang: 'id' }))
+  // Generate for 'id', 'en', and 'ja'
+  const idSlugs = getAllSlugs('id').map(slug => ({ slug, lang: 'id' }))
   const enSlugs = getAllSlugs('en').map(slug => ({ slug, lang: 'en' }))
-  return [...slugs, ...enSlugs]
+  const jaSlugs = getAllSlugs('ja').map(slug => ({ slug, lang: 'ja' }))
+  return [...idSlugs, ...enSlugs, ...jaSlugs]
 }
 
 export default async function DocumentPage(props: { params: Promise<{ slug: string[], lang: string }> }) {
@@ -22,5 +23,5 @@ export default async function DocumentPage(props: { params: Promise<{ slug: stri
   const lang = params.lang || 'id'
   const document = await getDocument(params.slug, lang)
   if (!document) notFound()
-  return <MarkdownDocument document={document} />
+  return <MarkdownDocument document={document} lang={lang} />
 }

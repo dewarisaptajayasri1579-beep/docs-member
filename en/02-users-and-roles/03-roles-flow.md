@@ -1,3 +1,3 @@
-# Flow Diagram — Users & Roles
+# User and Role Diagram
 
-This page displays an interactive diagram related to the role hierarchy (roles) and access permissions in the Membership Hub system.
+This page displays an interactive diagram related to the hierarchy of roles and access permissions on the Membership Hub system.

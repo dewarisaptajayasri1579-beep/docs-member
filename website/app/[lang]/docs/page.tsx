@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getNavigation } from '@/lib/docs'
 
 export function generateStaticParams() {
-  return [{ lang: 'id' }, { lang: 'en' }]
+  return [{ lang: 'id' }, { lang: 'en' }, { lang: 'ja' }]
 }
 
 export default async function DocsIndexPage(props: { params: Promise<{ lang: string }> }) {

@@ -2,9 +2,7 @@
 
 ## 1. Document Purpose
 
-This document explains the access rights of each role to modules, data, and actions within the Central Membership & SSO Hub system.
-
-This document serves as the basis for the implementation of:
+This document explains the access rights of each role to modules, data, and actions within the Central Membership & SSO Hub system. This document serves as the basis for the implementation of:
 
 - authorization,
 - middleware backend,
@@ -15,7 +13,7 @@ This document serves as the basis for the implementation of:
 ## 2. Roles Used
 
 - **Member**: End-user account owner.
-- **System**: Automated backend processes (webhook, scheduler, notifications).
+- **System**: Automatic backend process (webhook, scheduler, notification).
 - **Super Admin**: Internal team managing the platform.
 
 ## 3. Permission Principles
@@ -23,21 +21,21 @@ This document serves as the basis for the implementation of:
 1. All access is denied by default.
 2. Access is granted only if explicitly defined.
 3. Members can only access their own data.
-4. System can only process data within the context of legitimate processes.
-5. Super Admins cannot view member passwords.
-6. Frontend must not be the sole layer of security.
-7. Backend must validate role and data ownership on every request.
+4. The System can only process data in the context of a valid process.
+5. Super Admins cannot see member passwords.
+6. The frontend should not be the only security layer.
+7. The backend must validate roles and data ownership on every request.
 
-## 4. Definition of Access Types
+## 4. Access Type Definitions
 
-| Kode | Meaning |
+| Code | Meaning |
 |---|---|
 | `View` | View data |
 | `Create` | Create new data |
-| `Update` | Modify data |
+| `Update` | Update data |
 | `Delete` | Delete or cancel data |
-| `Process` | Run automated process |
-| `Manage` | Manage overall (full CRUD) |
+| `Process` | Run automatic process |
+| `Manage` | Manage everything (full CRUD) |
 | `None` | No access |
 
 ---
@@ -47,81 +45,81 @@ This document serves as the basis for the implementation of:
 | Module / Activity | Member | System | Super Admin |
 |---|---|---|---|
 | **Account & Authentication** | | | |
-| Account registration | `Create` | `Process` | `None` |
-| Email verification | `Process` | `Process` | `None` |
+| Register account | `Create` | `Process` | `None` |
+| Verify email | `Process` | `Process` | `None` |
 | Login to Hub | `Process` | `None` | `Process` |
 | Logout | `Process` | `None` | `Process` |
 | Forgot & reset password | `Process` | `Process` | `None` |
 | View own profile | `View` | `None` | `None` |
-| Edit own profile | `Update` | `None` | `None` |
-| View other member profiles | `None` | `None` | `View` (limited) |
-| Deactivate own account | `Update` | `None` | `None` |
-| Deactivate member account | `None` | `None` | `Update` |
+| Update own profile | `Update` | `None` | `None` |
+| View other member's profile | `None` | `None` | `View` (limited) |
+| Disable own account | `Update` | `None` | `None` |
+| Disable member account | `None` | `None` | `Update` |
 | **Products & Packages** | | | |
 | View product catalog | `View` | `None` | `View` |
 | View product package list | `View` | `None` | `View` |
 | Manage products (add/edit) | `None` | `None` | `Manage` |
 | Manage packages (add/edit/price) | `None` | `None` | `Manage` |
-| Deactivate package | `None` | `None` | `Update` |
+| Disable package | `None` | `None` | `Update` |
 | **Licenses** | | | |
 | Activate free package | `Create` | `None` | `None` |
-| View own licenses | `View` | `Process` | `None` |
-| View own License-ID | `View` | `Process` | `None` |
+| View own license | `View` | `Process` | `None` |
+| View License-ID own | `View` | `Process` | `None` |
 | Activate license (after payment) | `None` | `Process` | `None` |
 | Suspend license (suspend) | `None` | `Process` | `Update` |
 | Restore license (after payment) | `None` | `Process` | `Update` |
 | Cancel license | `None` | `None` | `Update` |
 | View all member licenses | `None` | `None` | `View` |
-| **Checkout & Payments** | | | |
+| **Checkout & Payment** | | | |
 | Create checkout order | `Create` | `None` | `None` |
 | Select payment gateway | `Update` | `None` | `None` |
 | Receive payment webhook | `None` | `Process` | `None` |
-| Verify webhook | `None` | `Process` | `None` |
+| Verify payment webhook | `None` | `Process` | `None` |
 | View own payment history | `View` | `None` | `None` |
 | Download own invoice | `View` | `None` | `None` |
 | View all transactions | `None` | `None` | `View` |
 | Process manual refund | `None` | `None` | `Update` |
-| **SSO & Tokens** | | | |
+| **SSO & Token** | | | |
 | Login via SSO (request auth code) | `Process` | `None` | `None` |
-| Exchange auth code for token | `None` | `Process` | `None` |
+| Exchange auth code with token | `None` | `Process` | `None` |
 | Issue JWT | `None` | `Process` | `None` |
 | Refresh access token | `Process` | `Process` | `None` |
 | Logout SSO | `Process` | `None` | `None` |
 | Revoke refresh token | `None` | `Process` | `Update` |
 | **Notifications & Email** | | | |
-| Manage notification preferences | `Update` | `None` | `None` |
-| Send automated email | `None` | `Process` | `None` |
-| View email delivery logs | `None` | `None` | `View` |
+| Set notification preferences | `Update` | `None` | `None` |
+| Send automatic email | `None` | `Process` | `None` |
+| View email delivery log | `None` | `None` | `View` |
 | **Super Admin Panel** | | | |
 | Access admin panel | `None` | `None` | `View` |
 | View aggregate statistics | `None` | `Process` | `View` |
 | View member list | `None` | `None` | `View` |
 | View member account details | `None` | `None` | `View` (limited) |
-| View error logs | `None` | `Process` | `View` |
-| View audit logs | `None` | `None` | `View` |
+| View error log | `None` | `Process` | `View` |
+| View audit log | `None` | `None` | `View` |
 | Manage system configuration | `None` | `None` | `Manage` |
 | Register new OAuth2 client | `None` | `None` | `Manage` |
 
 ---
 
-# 6. Permissions by Module
+# 6. Permission by Module
 
 ## 6.1 Authentication & Profile
 
 ### Member
-- Can register, log in, log out, and reset password.
-- Can view and edit own profile.
-- Cannot view or edit other member data.
+- Can register, login, logout, and reset password.
+- Can view and update own profile.
+- Cannot view or update other member's data.
 
 ### System
 - Can validate credentials during login.
-- Can send verification and password reset emails.
-- Can create and terminate sessions.
+- Can send email verification and reset password.
+- Can create and end sessions.
 
 ### Super Admin
-- Can view administrative member data (name, email, account status, registration date).
+- Can view administrative data of members (name, email, account status, registration date).
 - Cannot view member passwords in any form.
-- Can activate or deactivate member accounts.
+- Can enable or disable member accounts.
 
 ---
 
@@ -129,47 +127,47 @@ This document serves as the basis for the implementation of:
 
 ### Member
 - Can view product catalog and available package list.
-- Cannot modify products or packages.
+- Cannot update products or packages.
 
 ### System
-- Does not have direct access to product management.
+- Has no direct access to product management.
 
 ### Super Admin
 - Can add new products to the ecosystem.
-- Can manage packages per product (name, price, duration, features).
-- Can deactivate packages that are no longer offered.
+- Can manage package per product (name, price, duration, features).
+- Can disable packages that are no longer offered.
 
 ---
 
 ## 6.3 Licenses
 
 ### Member
-- Can activate free packages directly.
-- Can view all their licenses.
+- Can activate free package directly.
+- Can view all licenses belonging to them.
 - Can view License-ID and license status.
-- Cannot activate, suspend, or cancel licenses directly (except through legitimate processes).
+- Cannot activate, suspend, or cancel licenses directly (except through valid processes).
 
 ### System
 - Activates licenses after successful payment webhook confirmation.
-- Automatically updates license status (`active` → `grace_period` → `suspended`).
+- Automatically updates license status (active → grace_period → suspended).
 - Cannot activate licenses without valid payment confirmation.
 
 ### Super Admin
 - Can view all licenses of all members.
-- Can manually suspend or restore licenses under certain conditions.
+- Can suspend or restore licenses manually in certain conditions.
 - Every manual action is recorded in the audit log.
 
 ---
 
-## 6.4 Checkout & Payments
+## 6.4 Checkout & Payment
 
 ### Member
-- Can initiate checkout and select a payment gateway.
-- Can view payment history and download their own invoices.
-- Cannot modify or delete transaction history.
+- Can initiate checkout and select payment gateway.
+- Can view payment history and download own invoice.
+- Cannot update or delete transaction history.
 
 ### System
-- Receives and verifies webhooks from the payment gateway.
+- Receives and verifies payment webhooks from the payment gateway.
 - Activates licenses after successful confirmation.
 - Records every transaction.
 
@@ -179,26 +177,26 @@ This document serves as the basis for the implementation of:
 
 ---
 
-## 6.5 SSO & Tokens
+## 6.5 SSO & Token
 
 ### Member
-- Can initiate the SSO login flow to SaaS applications.
+- Can initiate SSO login flow to SaaS applications.
 - Can refresh tokens.
 - Cannot issue JWT directly.
 
 ### System
 - Issues JWT after successful validation.
 - Verifies refresh tokens.
-- Revokes tokens if the license is inactive.
+- Revokes tokens if licenses are not active.
 
 ### Super Admin
-- Can revoke member refresh tokens if necessary (e.g., security incidents).
+- Can revoke refresh tokens if necessary (e.g., security cases).
 
 ---
 
 # 7. Data Ownership Rules
 
-Every request for member personal data must validate:
+Every request to member personal data must validate:
 
 ```text
 resource.member_id == authenticated_member.id
@@ -215,13 +213,13 @@ Data that must have ownership:
 
 ## 7.1 Backend Validation
 
-Backend must:
+The backend must:
 
-- check if the member is logged in,
-- check the role,
-- check data ownership,
-- check account status (`active`),
-- and deny access if any of the conditions are not met.
+- Check if the member is logged in,
+- Check the role,
+- Check data ownership,
+- Check account status (`active`),
+- and deny access if any condition is not met.
 
 ## 7.2 Access Denied Response
 
@@ -229,32 +227,32 @@ Backend must:
 |---|---|
 | Not logged in | `401 Unauthorized` |
 | No permission | `403 Forbidden` |
-| Data existence should not be revealed | `404 Not Found` |
+| Data should not exist | `404 Not Found` |
 
 ---
 
-# 8. Permissions on the Interface (Frontend)
+# 8. Permission on Interface (Frontend)
 
-Frontend must:
+The frontend must:
 
-- hide menus unavailable for the active role,
-- disable buttons that should not be used,
-- not load unnecessary data,
-- and display clear access messages if denied.
+- Hide menus that are not available for the active role,
+- Disable buttons that should not be used,
+- Not load unnecessary data,
+- And display clear access messages if denied.
 
-However, frontend hiding is **not the primary security measure**. The backend must still perform validation on every request.
+However, frontend hiding is **not the primary security measure**. The backend must still validate every request.
 
 ---
 
-# 9. Permission Acceptance Criteria
+# 9. Acceptance Criteria for Permission
 
 Permission implementation is considered complete if:
 
-- members cannot view other member data,
-- members can only modify their own data,
-- licenses are only activated after valid webhook confirmation,
-- System cannot activate licenses without a legitimate source,
+- Members cannot view other member's data,
+- Members can only update their own data,
+- Licenses are only active after valid webhook confirmation,
+- The System cannot activate licenses without a valid source,
 - Super Admins cannot view member passwords,
-- all endpoints have access validation,
-- access is denied with the appropriate HTTP response,
-- and important administrative actions are recorded in the audit log.
+- All endpoints have access validation,
+- Access is denied with the correct HTTP response,
+- And important administrative

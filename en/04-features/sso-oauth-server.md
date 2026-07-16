@@ -1,26 +1,26 @@
-# SSO / OAuth2 Server Feature — Central Membership & SSO Hub
+# Single Sign-On (SSO) / OAuth2 Server Feature — Central Membership & SSO Hub
 
 ## 1. Document Purpose
 
-This document describes the specifications for the SSO / OAuth2 Server feature run by the Membership Hub. The SSO Hub functions as an **Identity Provider (IdP)** that issues authentication tokens to SaaS applications within the ecosystem.
+This document explains the specifications of the SSO / OAuth2 Server feature run by the Membership Hub. The SSO Hub functions as an **Identity Provider (IdP)** that issues authentication tokens to SaaS applications within the ecosystem.
 
 ---
 
-# 2. Role of Membership Hub as an OAuth2 Server
+# 2. Membership Hub as OAuth2 Server
 
-The Membership Hub implements **OAuth2 Authorization Code Flow with PKCE** as the authentication standard.
+Membership Hub implements **OAuth2 Authorization Code Flow with PKCE** as the authentication standard.
 
 ```
-The Hub acts as:
+Hub plays the role of:
 ├── Authorization Server  →  Issues authorization code & token
 ├── Identity Provider     →  Stores & validates member identities
 └── Resource Server       →  Provides member profile & license information
 ```
 
-Each SaaS application joining the ecosystem acts as:
+Each SaaS application that joins the ecosystem plays the role of:
 
 ```
-SaaS applications act as:
+SaaS application plays the role of:
 └── OAuth2 Client (Relying Party)  →  Requests access on behalf of the member
 ```
 
@@ -28,7 +28,7 @@ SaaS applications act as:
 
 # 3. OAuth2 Endpoints
 
-## 3.1 List of Main Endpoints
+## 3.1 Main Endpoints
 
 | Endpoint | Method | Function |
 |---|---|---|
@@ -47,7 +47,7 @@ SaaS applications act as:
 
 **Request:**
 
-```
+```http
 GET /oauth/authorize
   ?client_id=CLIENT_ID
   &redirect_uri=https://app.noto.com/auth/callback
@@ -58,7 +58,7 @@ GET /oauth/authorize
   &code_challenge_method=S256
 ```
 
-**Parameter:**
+**Parameters:**
 
 | Parameter | Required | Description |
 |---|---|---|
@@ -66,13 +66,13 @@ GET /oauth/authorize
 | `redirect_uri` | Yes | Registered callback URL |
 | `response_type` | Yes | Must be `code` |
 | `scope` | Yes | Requested scope |
-| `state` | Yes | Random value to prevent CSRF |
+| `state` | Yes | Random value for CSRF prevention |
 | `code_challenge` | Yes (PKCE) | Hash of `code_verifier` |
 | `code_challenge_method` | Yes (PKCE) | Must be `S256` |
 
-**Success Response** — Redirect to `redirect_uri`:
+**Successful Response** — Redirect to `redirect_uri`:
 
-```
+```http
 https://app.noto.com/auth/callback
   ?code=AUTH_CODE
   &state=RANDOM_CSRF_STATE
@@ -80,7 +80,7 @@ https://app.noto.com/auth/callback
 
 **Error Response** — Redirect with error:
 
-```
+```http
 https://app.noto.com/auth/callback
   ?error=access_denied
   &error_description=License+not+found
@@ -91,7 +91,7 @@ https://app.noto.com/auth/callback
 
 ## 3.3 `/oauth/token` — Token Endpoint
 
-### 3.3.1 Exchange Authorization Code for Token
+### 3.3.1 Exchanging Authorization Code for Token
 
 **Request:**
 
@@ -119,7 +119,7 @@ grant_type=authorization_code
 }
 ```
 
-### 3.3.2 Refresh Access Token
+### 3.3.2 Refreshing Access Token
 
 **Request:**
 
@@ -162,7 +162,7 @@ Authorization: Bearer ACCESS_TOKEN
 
 # 4. JWT Access Token Structure
 
-JWTs are signed using **RS256** (RSA Signature with SHA-256).
+JWT is signed using **RS256** (RSA Signature with SHA-256).
 
 ## 4.1 Header
 
@@ -195,23 +195,23 @@ JWTs are signed using **RS256** (RSA Signature with SHA-256).
 }
 ```
 
-## 4.3 Claims Explanation
+## 4.3 Claim Explanation
 
 | Claim | Type | Description |
 |---|---|---|
 | `sub` | string | Unique member ID (Subject) |
-| `name` | string | Member's full name |
-| `email` | string | Member's email |
-| `email_verified` | boolean | Whether email has been verified |
+| `name` | string | Member full name |
+| `email` | string | Member email |
+| `email_verified` | boolean | Whether email is verified |
 | `product` | string | SaaS product code that allows login |
-| `license_id` | string | Member's License-ID for this product |
-| `tier` | string | Active plan (`free`, `pro`, `business`) |
+| `license_id` | string | Member license-ID for this product |
+| `tier` | string | Active package (`free`, `pro`, `business`) |
 | `license_status` | string | License status (`active`, `active_free`, `grace_period`, `suspended`) |
 | `expires_at` | timestamp / null | License expiration time (`null` = free forever) |
 | `iss` | string | Issuer: Hub URL |
-| `aud` | string | Audience: SaaS application `client_id` |
-| `iat` | timestamp | Time token was issued (Issued At) |
-| `exp` | timestamp | Time token expires (Expiry) |
+| `aud` | string | Audience: `client_id` of SaaS application |
+| `iat` | timestamp | Token issuance time (Issued At) |
+| `exp` | timestamp | Token expiry time (Expiry) |
 | `jti` | string | Unique token ID (JWT ID) for revocation |
 
 ---
@@ -226,9 +226,9 @@ JWTs are signed using **RS256** (RSA Signature with SHA-256).
 
 ---
 
-# 6. OAuth2 Client Registration (SaaS Application)
+# 6. Registering OAuth2 Client (SaaS Application)
 
-Each SaaS application joining the ecosystem must register itself as an OAuth2 Client.
+Each SaaS application that joins the ecosystem must register itself as an OAuth2 Client.
 
 ## 6.1 Required Information
 
@@ -238,7 +238,7 @@ Each SaaS application joining the ecosystem must register itself as an OAuth2 Cl
 | `product_code` | NTO | Product code in the system |
 | `redirect_uris` | `https://app.noto.com/auth/callback` | List of allowed callback URLs |
 | `post_logout_redirect_uris` | `https://app.noto.com/logout` | URL after Hub logout |
-| `logo_uri` | URL logo aplikasi | Displayed on the consent page |
+| `logo_uri` | Application logo URL | Displayed on consent page |
 | `homepage_uri` | `https://app.noto.com` | Application homepage URL |
 
 ## 6.2 Registration Result
@@ -252,15 +252,15 @@ After registration, the system issues:
 }
 ```
 
-`client_secret` is displayed only once. Store it securely.
+`client_secret` is only shown once. Save it securely.
 
 ---
 
-# 7. Public Key Rotation (JWKS)
+# 7. Rotating Public Key (JWKS)
 
-- The Membership Hub uses an **RSA key pair** (private key + public key).
-- The private key is used to sign JWTs (only present on the Hub server).
-- The public key is published via the `/.well-known/jwks.json` endpoint.
+- Membership Hub uses a **RSA key pair** (private key + public key).
+- Private key is used to sign JWT (only on the server).
+- Public key is published through the `/.well-known/jwks.json` endpoint.
 
 **Example JWKS response:**
 
@@ -281,101 +281,15 @@ After registration, the system issues:
 
 **Key rotation:**
 
-- Keys can be rotated periodically for security.
-- Old keys remain available in JWKS to validate tokens that are still active.
-- After all old tokens expire, old keys are removed from JWKS.
-- SaaS applications are advised to retrieve JWKS from the endpoint (not hardcode) and cache it.
+- Key can be rotated periodically for security.
+- Old key remains available in JWKS for validating active tokens.
+- After all old tokens expire, old key is removed from JWKS.
+- SaaS applications are recommended to fetch JWKS from the endpoint (not hardcode) and cache it.
 
 ---
 
 # 8. Hub Session
 
-- After a member successfully logs into the Hub, a **Hub session** is created on the server.
-- The Hub session allows members to log into multiple different applications without having to enter credentials repeatedly (true SSO).
-- The Hub session has an expiration period (e.g., 8 hours from the last login).
-- The Hub session ends when the member logs out or the expiration period is over.
-
----
-
-# 9. Logout and Token Revocation
-
-## 9.1 Logout from SaaS Application
-
-1. The application deletes local sessions and tokens.
-2. The application (optional) redirects to Hub logout.
-
-## 9.2 Logout from Hub (SSO Logout)
-
-```
-GET /oauth/logout
-  ?post_logout_redirect_uri=https://app.noto.com/logout
-```
-
-After Hub logout:
-
-- Hub session is deleted.
-- Refresh token is revoked.
-- The member needs to log in to the Hub again to get a new access token.
-
-## 9.3 Manual Token Revocation
-
-```http
-POST /oauth/revoke
-Authorization: Basic [BASE64(client_id:client_secret)]
-Content-Type: application/x-www-form-urlencoded
-
-token=REFRESH_TOKEN_TO_REVOKE
-&token_type_hint=refresh_token
-```
-
-Used by:
-
-- Super Admin to revoke specific member tokens in security cases.
-- SaaS applications when detecting suspicious activity.
-
----
-
-# 10. How SaaS Applications Verify JWTs
-
-Mandatory verification steps for every SaaS application:
-
-```
-1. Retrieve the public key from /.well-known/jwks.json (cache, not per-request)
-2. Verify the JWT signature using the public key with the RS256 algorithm
-3. Check claim "iss" = "https://hub.domain.com"
-4. Check claim "aud" = this application's client_id
-5. Check claim "exp" has not expired
-6. Check claim "product" matches this application's product code
-7. Check claim "license_status" = "active", "active_free", or "grace_period"
-```
-
-If any step fails → deny access.
-
----
-
-# 11. Security
-
-| Aspect | Implementation |
-|---|---|
-| Signing algorithm | RS256 (asymmetric) |
-| PKCE | Required to prevent authorization code interception |
-| State parameter | Required to prevent CSRF |
-| Redirect URI | Only registered URIs are accepted (exact match) |
-| client_secret | Only used in backend-to-backend (not in frontend) |
-| HTTPS | Required for all endpoints |
-| Token expiry | Access Token: 1 hour; Refresh Token: 30 days |
-| Token rotation | Refresh Token is rotated every time it's used |
-| JTI | Each JWT has a unique ID for individual revocation |
-
----
-
-# 12. Acceptance Criteria
-
-- SaaS applications can complete the Authorization Code + PKCE flow.
-- JWT contains all required claims with correct values.
-- SaaS applications can verify JWTs using JWKS without contacting the Hub per request.
-- Members with inactive licenses do not receive tokens.
-- Refresh Token can update Access Token.
-- Logout deletes the Hub session and revokes the Refresh Token.
-- State and PKCE are validated; invalid requests are rejected.
-- The JWKS endpoint is publicly accessible and returns valid keys.
+- After a member successfully logs in to Hub, a **Hub session** is created on the server.
+- Hub session allows members to log in to multiple applications without re-entering credentials (true SSO).
+- Hub session has an expiration time (e.g., 8 hours from last

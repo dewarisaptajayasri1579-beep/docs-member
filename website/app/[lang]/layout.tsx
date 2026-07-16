@@ -29,9 +29,9 @@ export default async function RootLayout(
   return (
     <html lang={lang} data-theme="dark" suppressHydrationWarning>
       <head>
-        <Script id="theme-script" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
+        <Script id="theme-script" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
         <DocsShell lang={lang} navigation={getNavigation(lang)}>{props.children}</DocsShell>
       </body>
     </html>

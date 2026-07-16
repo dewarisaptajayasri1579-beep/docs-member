@@ -2,10 +2,7 @@
 
 ## Purpose
 
-This ERD defines the relational data model for the Central Membership & SSO Hub.
-The main database uses PostgreSQL 15+ with Prisma as the ORM. Primary keys
-use UUIDs, timestamps are stored as UTC, and table/column names use
-`snake_case`.
+This ERD defines a relational data model for the Central Membership & SSO Hub. The primary database uses PostgreSQL 15+ with Prisma as the ORM. The primary key uses UUID, timestamps are stored as UTC, and table/column names use `snake_case`.
 
 ```mermaid
 erDiagram
@@ -96,13 +93,12 @@ erDiagram
 ## Important Relationships and Constraints
 
 | Relationship | Cardinality | Integrity Rule |
-|---|---:|---|
-| Member → License | 1 : N | A member may only have one active license per product. |
-| Product → Plan | 1 : N | A plan is always owned by exactly one product. |
-| License → Order | 1 : N | An order can create a new license or extend an existing one. |
-| Order → Payment | 1 : N | Supports retries; only successful payments finalize the order. |
-| Payment → Webhook Event | 1 : N | Gateway payload/retry is recorded for audit and idempotency. |
-| OAuth Client → Code/Token | 1 : N | Authorization codes and refresh tokens are bound to the requesting client. |
+| --- | ---: | --- |
+| Member → License | 1 : N | One member can only have one active license per product. |
+| Product → Plan | 1 : N | A plan is always owned by one product. |
+| License → Order | 1 : N | An order can create a new license or renew an existing one. |
+| Order → Payment | 1 : N | Supports retries; only successful payments finalize an order. |
+| Payment → Webhook Event | 1 : N | Payload/retry gateway is recorded for audit and idempotence. |
+| OAuth Client → Code/Token | 1 : N | Authorization code and refresh token are tied to the requesting client. |
 
-The rule of one active license per member and product is enforced via a partial unique
-index on `licenses (member_id, product_id)` for statuses other than `cancelled`.
+The rule of one active license per member and product is enforced through a partial unique index on `licenses (member_id, product_id)` for statuses other than `cancelled`.

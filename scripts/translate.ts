@@ -9,7 +9,10 @@ const __dirname = path.dirname(__filename)
 
 const ROOT_DIR = path.resolve(__dirname, '..')
 const ID_DIR = path.join(ROOT_DIR, 'id')
-const EN_DIR = path.join(ROOT_DIR, 'en')
+const TARGET_LANGS = [
+  { code: 'en', dir: path.join(ROOT_DIR, 'en'), name: 'English' },
+  { code: 'ja', dir: path.join(ROOT_DIR, 'ja'), name: 'Japanese' }
+]
 const CACHE_FILE = path.join(__dirname, '.translate-cache.json')
 
 // Load .env manually to avoid extra dependencies if possible
@@ -22,9 +25,9 @@ if (fs.existsSync(envPath)) {
   })
 }
 
-const API_KEY = process.env.GEMINI_API_KEY
+const API_KEY = process.env.GROQ_API_KEY
 if (!API_KEY) {
-  console.error('Error: GEMINI_API_KEY is not set in .env')
+  console.error('Error: GROQ_API_KEY is not set in .env')
   process.exit(1)
 }
 
@@ -46,25 +49,30 @@ function walk(directory: string): string[] {
   return files
 }
 
-async function translateMarkdown(text: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`
-  const prompt = `You are an expert technical translator. Translate the following documentation from Indonesian to English.
+async function translateMarkdown(text: string, targetLangName: string): Promise<string> {
+  const url = `https://api.groq.com/openai/v1/chat/completions`
+  const prompt = `You are an expert technical translator. Translate the following documentation from Indonesian to ${targetLangName}.
 CRITICAL RULES:
 1. Maintain exactly the same markdown formatting (headings, lists, bolding, italics).
 2. DO NOT translate anything inside \`\`\` code blocks or inline \`code\`.
 3. Keep technical terms intact (e.g., SSO, Grace Period, Webhook, License-ID).
 4. Do not output any conversational wrapper text. Return only the translated markdown.
 5. If the document is a "README.md", translate it normally but keep the filename as "README.md".
+6. IMPORTANT: You MUST completely translate the main title / H1 heading (the very first line starting with "# ") into ${targetLangName}. Do NOT leave it in Indonesian or English!
 
 Here is the markdown:
 ${text}`
 
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`
+    },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.1 }
+      model: 'llama-3.1-8b-instant',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.1
     })
   })
 
@@ -74,7 +82,7 @@ ${text}`
   }
 
   const data = await res.json()
-  return data.candidates[0].content.parts[0].text
+  return data.choices[0].message.content
 }
 
 async function run() {
@@ -89,45 +97,59 @@ async function run() {
   const idFiles = walk(ID_DIR)
   let translatedCount = 0
 
-  for (const idFilePath of idFiles) {
-    const relPath = path.relative(ID_DIR, idFilePath)
-    const enFilePath = path.join(EN_DIR, relPath)
+  for (const lang of TARGET_LANGS) {
+    console.log(`\n🌐 Memproses bahasa: ${lang.name}...`)
     
-    const content = fs.readFileSync(idFilePath, 'utf8')
-    const hash = getMd5(content)
+    for (const idFilePath of idFiles) {
+      const relPath = path.relative(ID_DIR, idFilePath)
+      const targetFilePath = path.join(lang.dir, relPath)
+      const cacheKey = `${lang.code}:${relPath}`
+      
+      const content = fs.readFileSync(idFilePath, 'utf8')
+      const hash = getMd5(content)
 
-    // Check if translation is needed
-    if (cache[relPath] === hash && fs.existsSync(enFilePath)) {
-      continue // No change
-    }
+      // Check if translation is needed
+      if (cache[cacheKey] === hash && fs.existsSync(targetFilePath)) {
+        continue // No change
+      }
 
-    console.log(`⏳ Menerjemahkan: ${relPath}`)
-    
-    try {
-      const translated = await translateMarkdown(content)
+      console.log(`⏳ Menerjemahkan ke ${lang.code}: ${relPath}`)
       
-      // Ensure EN directory exists
-      fs.mkdirSync(path.dirname(enFilePath), { recursive: true })
-      fs.writeFileSync(enFilePath, translated, 'utf8')
-      
-      // Update cache
-      cache[relPath] = hash
-      fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2), 'utf8')
-      
-      console.log(`✅ Selesai: ${relPath}`)
-      translatedCount++
-      
-      // Sleep a bit to avoid rate limits
-      await new Promise(r => setTimeout(r, 2000))
-    } catch (err: any) {
-      console.error(`❌ Gagal menerjemahkan ${relPath}: ${err.message}`)
+      let success = false
+      let attempts = 0
+      while (!success && attempts < 3) {
+        try {
+          const translated = await translateMarkdown(content, lang.name)
+          
+          fs.mkdirSync(path.dirname(targetFilePath), { recursive: true })
+          fs.writeFileSync(targetFilePath, translated, 'utf8')
+          
+          cache[cacheKey] = hash
+          fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2), 'utf8')
+          
+          console.log(`✅ Selesai: ${relPath}`)
+          translatedCount++
+          success = true
+          
+          await new Promise(r => setTimeout(r, 3000))
+        } catch (err: any) {
+          attempts++
+          console.error(`❌ Gagal menerjemahkan ${relPath} (Percobaan ${attempts}/3): ${err.message}`)
+          if (attempts < 3) {
+            console.log(`Menunggu 10 detik sebelum mencoba lagi...`)
+            await new Promise(r => setTimeout(r, 10000))
+          } else {
+            console.log(`Menyerah pada file ini setelah 3x gagal.`)
+          }
+        }
+      }
     }
   }
 
   if (translatedCount === 0) {
-    console.log('✨ Semua dokumen bahasa Inggris sudah up-to-date.')
+    console.log('\n✨ Semua dokumen sudah up-to-date.')
   } else {
-    console.log(`🎉 Selesai menerjemahkan ${translatedCount} dokumen.`)
+    console.log(`\n🎉 Selesai menerjemahkan ${translatedCount} dokumen.`)
   }
 }
 

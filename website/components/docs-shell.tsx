@@ -73,7 +73,7 @@ export function DocsShell({ lang, navigation, children }: { lang: string; naviga
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder={lang === 'en' ? 'Search documentation…' : 'Cari dokumentasi…'}
+              placeholder={lang === 'en' ? 'Search documentation…' : lang === 'ja' ? 'ドキュメントを検索…' : 'Cari dokumentasi…'}
             />
             {query && (
               <button className="search-clear" type="button" onClick={() => setQuery('')}>✕</button>
@@ -119,17 +119,19 @@ export function DocsShell({ lang, navigation, children }: { lang: string; naviga
           <button
             className="hamburger"
             onClick={() => setMobileOpen(v => !v)}
-            aria-label={lang === 'en' ? 'Open menu' : 'Buka menu'}
+            aria-label={lang === 'en' ? 'Open menu' : lang === 'ja' ? 'メニューを開く' : 'Buka menu'}
           >
             <span /><span /><span />
           </button>
-          <Link href={`/${lang}`} className="topbar-home">⌂ {lang === 'en' ? 'Home' : 'Beranda'}</Link>
+          <Link href={`/${lang}`} className="topbar-home">⌂ {lang === 'en' ? 'Home' : lang === 'ja' ? 'ホーム' : 'Beranda'}</Link>
         </div>
         <div className="topbar-right">
           <div className="lang-switcher">
             <Link href={pathname.replace(`/${lang}`, '/id')} className={lang === 'id' ? 'active' : ''}>ID</Link>
             <span className="sep">/</span>
             <Link href={pathname.replace(`/${lang}`, '/en')} className={lang === 'en' ? 'active' : ''}>EN</Link>
+            <span className="sep">/</span>
+            <Link href={pathname.replace(`/${lang}`, '/ja')} className={lang === 'ja' ? 'active' : ''}>JA</Link>
           </div>
           <div className="mode-toggle">
             <span>Simple</span>
@@ -137,7 +139,7 @@ export function DocsShell({ lang, navigation, children }: { lang: string; naviga
               className="toggle-btn"
               onClick={() => setDetail(v => !v)}
               aria-pressed={detail}
-              aria-label={lang === 'en' ? 'Toggle mode' : 'Ganti mode'}
+              aria-label={lang === 'en' ? 'Toggle mode' : lang === 'ja' ? 'モード切替' : 'Ganti mode'}
             >
               <i className={`knob${detail ? ' on' : ''}`} />
             </button>
@@ -146,7 +148,7 @@ export function DocsShell({ lang, navigation, children }: { lang: string; naviga
           <button
             className="theme-btn"
             onClick={() => setDark(v => !v)}
-            aria-label={dark ? (lang === 'en' ? 'Light mode' : 'Mode terang') : (lang === 'en' ? 'Dark mode' : 'Mode gelap')}
+            aria-label={dark ? (lang === 'en' ? 'Light mode' : lang === 'ja' ? 'ライトモード' : 'Mode terang') : (lang === 'en' ? 'Dark mode' : lang === 'ja' ? 'ダークモード' : 'Mode gelap')}
           >
             {dark ? '☀' : '☾'}
           </button>
