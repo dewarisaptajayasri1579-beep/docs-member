@@ -4,7 +4,7 @@ import { remark } from 'remark'
 import remarkGfm from 'remark-gfm'
 import remarkHtml from 'remark-html'
 
-const DOCS_ROOT = path.resolve(process.cwd(), '..')
+const DOCS_ROOT = process.cwd()
 const ignoredDirectories = new Set(['.git', 'website', 'versions', 'node_modules'])
 
 export type NavItem = { title: string; slug: string[]; sortKey: string }

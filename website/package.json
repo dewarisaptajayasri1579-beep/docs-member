@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "translate": "npx tsx ../scripts/translate.ts"
+    "translate": "npx tsx ./scripts/translate.ts"
   },
   "dependencies": {
     "next": "16.2.6",
