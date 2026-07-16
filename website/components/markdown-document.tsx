@@ -2,6 +2,7 @@ import type { Document } from '@/lib/docs'
 import { FlowDiagram } from './flow-diagram'
 import { RolesDiagram } from './roles-diagram'
 import { BusinessFlowDiagram } from './business-flow-diagram'
+import { LiveEditor } from './live-editor'
 
 function readingTime(html: string): number {
   const words = html.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length
@@ -23,7 +24,7 @@ export function MarkdownDocument({ document, lang = 'id' }: { document: Document
       {slugStr === '03-business-flows/00-flow' && <BusinessFlowDiagram lang={lang} defaultTab={0} />}
       {slugStr === '02-users-and-roles/03-roles-flow' && <RolesDiagram lang={lang} />}
 
-      <article className="markdown" dangerouslySetInnerHTML={{ __html: document.html }} />
+      <LiveEditor html={document.html} raw={document.raw} filePath={document.filePath} lang={lang} />
     </main>
   )
 }

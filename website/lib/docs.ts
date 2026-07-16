@@ -9,7 +9,7 @@ const ignoredDirectories = new Set(['.git', 'website', 'versions', 'node_modules
 
 export type NavItem = { title: string; slug: string[]; sortKey: string }
 export type NavSection = { title: string; items: NavItem[]; sortKey: string }
-export type Document = { title: string; html: string; slug: string[]; section: string }
+export type Document = { title: string; html: string; raw: string; filePath: string; slug: string[]; section: string }
 
 function titleFromFilename(file: string) {
   return file
@@ -127,5 +127,7 @@ export async function getDocument(slug: string[], lang: string = 'id'): Promise<
     ? (lang === 'en' ? 'Documentation' : lang === 'ja' ? 'ドキュメント' : 'Dokumentasi') 
     : titleFromFilename(sectionRaw)
     
-  return { title: heading, html, slug, section: sectionTitle }
+  const relativeFilePath = path.relative(DOCS_ROOT, filePath)
+    
+  return { title: heading, html, raw: source, filePath: relativeFilePath, slug, section: sectionTitle }
 }

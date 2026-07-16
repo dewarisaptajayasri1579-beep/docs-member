@@ -112,6 +112,15 @@ async function run() {
       if (cache[cacheKey] === hash && fs.existsSync(targetFilePath)) {
         continue // No change
       }
+      
+      // Check if target file exists and has manual override
+      if (fs.existsSync(targetFilePath)) {
+        const targetContent = fs.readFileSync(targetFilePath, 'utf8')
+        if (targetContent.includes('<!-- manual -->')) {
+          console.log(`🔒 Melewati (dikunci manual): ${relPath}`)
+          continue
+        }
+      }
 
       console.log(`⏳ Menerjemahkan ke ${lang.code}: ${relPath}`)
       
